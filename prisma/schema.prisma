@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+model User {
+  // General details
+  id                     Int      @id @default(autoincrement())
+  username               String
+  email                  String   @unique
+  phone                  String   @unique
+  password               String
+  // App related details
+  role                   UserRole @default(USER)
+  verified               Boolean  @default(false)
+  otp                    Otp[]
+  // Configurations
+  passwordResetRequested Boolean  @default(false)
+
+  qr  QrlakeData[]
+  tag TagName[]
+}
+
+enum OtpType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+}
+
+model Otp {
+  id        Int      @id @default(autoincrement())
+  code      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  type      OtpType
+  // The user associated with the OTP code
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model QrlakeData {
+  id        Int      @id @default(autoincrement())
+  category  String
+  knownFor  String
+  image     String?
+  location  String
+  rating    Int?     @default(1)
+  name      String
+  desc      String
+  favourite Boolean? @default(false)
+  like      Boolean? @default(false)
+  dislike   Boolean? @default(false)
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model TagName {
+  id      Int    @id @default(autoincrement())
+  tagName String
+
+  User   User? @relation(fields: [userId], references: [id])
+  userId Int?
+}

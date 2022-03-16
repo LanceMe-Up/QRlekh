@@ -64,6 +64,9 @@ model QrlakeData {
 
   user   User @relation(fields: [userId], references: [id])
   userId Int
+
+  TagName   TagName? @relation(fields: [tagNameId], references: [id])
+  tagNameId Int?
 }
 
 model TagName {
@@ -72,4 +75,6 @@ model TagName {
 
   User   User? @relation(fields: [userId], references: [id])
   userId Int?
+
+  qr QrlakeData[]
 }

@@ -34,11 +34,11 @@ export class TagService {
     return data;
   }
 
-  async deleteTag(id: number) {
+  async deleteTag(ids: number) {
     await this.prismaService.tagName.delete({
-      where: { id: Number(id) },
+      where: { id: Number(ids) },
     });
 
-    return { success: true, data: `Delete Tag with id ${id}` };
+    return { success: true, data: `Delete Tag with id ${ids}` };
   }
 }

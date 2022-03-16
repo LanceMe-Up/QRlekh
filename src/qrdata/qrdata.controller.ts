@@ -22,7 +22,11 @@ export class QrdataController {
 
   @Post()
   async create(@Body() createDto: QrDto, @Request() req: any) {
-    return await this.qrService.createQr({ ...createDto }, req.user.id);
+    return await this.qrService.createQr(
+      { ...createDto },
+      req.user.id,
+      +createDto.tagNameId,
+    );
   }
 
   @Get()

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEmpty, IsString } from 'class-validator';
+import { IsEmpty, IsOptional, IsString } from 'class-validator';
 
 export class QrDto {
   @IsString()
@@ -46,4 +46,7 @@ export class QrDto {
 
   @IsEmpty()
   user: any;
+
+  @IsOptional()
+  tagNameId: number;
 }

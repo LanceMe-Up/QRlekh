@@ -6,7 +6,11 @@ import { PrismaService } from '../prisma.service';
 export class QrdataService {
   constructor(private prismaService: PrismaService) {}
 
-  async createQr(createQr: Prisma.QrlakeDataCreateInput, id: number) {
+  async createQr(
+    createQr: Prisma.QrlakeDataCreateInput,
+    id: number,
+    tagId: number,
+  ) {
     return this.prismaService.qrlakeData.create({
       data: {
         desc: createQr.desc,
@@ -16,6 +20,7 @@ export class QrdataService {
         location: createQr.location,
         rating: createQr.rating,
         userId: id,
+        tagNameId: tagId,
       },
     });
   }
@@ -24,6 +29,7 @@ export class QrdataService {
     return this.prismaService.qrlakeData.findMany({
       include: {
         user: true,
+        TagName: true,
       },
     });
   }

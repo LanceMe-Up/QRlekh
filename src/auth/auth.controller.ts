@@ -31,12 +31,6 @@ export class AuthController {
     return this.authService.login(req.user);
   }
 
-  @UseGuards(LocalAuthGuard)
-  @Post('logout')
-  async logout(@Request() req) {
-    return this.authService.logout(req.user.username);
-  }
-
   @Post('reset-password')
   async ResetPassword(@Body() input: InitiateResetPasswordDto) {
     return this.authService.resetUserPassword(input.email);

@@ -9,14 +9,12 @@ import { UserService } from '../user/user.service';
 import { CreateUserDto } from '../user/dto/createUser.dto';
 
 import { compare } from 'bcrypt';
-import { PrismaService } from '../prisma.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private userService: UserService,
     private jwtService: JwtService,
-    private prismaService: PrismaService,
   ) {}
 
   async validateUser(email: string, password: string) {
@@ -58,21 +56,6 @@ export class AuthService {
       phone: userDetail.phone,
       role: userDetail.role,
     });
-  }
-
-  async logout(username: any) {
-    await this.prismaService.user.updateMany({
-      where: {
-        username,
-        password: {
-          not: null,
-        },
-      },
-      data: {
-        password: null,
-      },
-    });
-    return { username };
   }
 
   async resetUserPassword(email: string) {

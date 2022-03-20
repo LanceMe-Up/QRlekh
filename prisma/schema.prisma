@@ -70,8 +70,10 @@ model QrlakeData {
 }
 
 model TagName {
-  id      Int    @id @default(autoincrement())
+  id      Int      @id @default(autoincrement())
   tagName String
+  lat     Decimal? @unique
+  long    Decimal? @unique
 
   User   User? @relation(fields: [userId], references: [id])
   userId Int?

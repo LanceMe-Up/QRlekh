@@ -40,6 +40,12 @@ export class TagController {
     return this.tagService.getTagId({ id: +id });
   }
 
+  @UseGuards(JwtAuthGuard)
+  @Get(':lat/:long')
+  async getByTagLat(@Param('lat') lat: string, @Param('long') long: string) {
+    return this.tagService.getTaging(+lat, +long);
+  }
+
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @Delete(':id')

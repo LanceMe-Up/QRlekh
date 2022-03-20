@@ -12,19 +12,58 @@ export class TagService {
       data: {
         tagName: tag.tagName,
         userId: user,
+        lat: tag.lat,
+        long: tag.long,
       },
+    });
+  }
+
+  async getNearTag(where: Prisma.TagNameWhereUniqueInput) {
+    const datum = await this.getTag();
+    console.log(datum);
+    return await this.prismaService.tagName.findUnique({
+      where,
     });
   }
 
   async getTag() {
-    return this.prismaService.tagName.findMany({
+    const data = await this.prismaService.tagName.findMany({
       include: {
         User: true,
       },
     });
+
+    return { count: data.length, data };
+  }
+
+  async getTaging(lat: number, long: number) {
+    const data = await this.prismaService.tagName.findMany({
+      where: {
+        AND: [
+          {
+            lat: {
+              gte: lat,
+            },
+            long: {
+              gte: long,
+            },
+          },
+        ],
+      },
+      include: {
+        User: true,
+      },
+    });
+
+    return { count: data.length, data };
   }
 
   async getTagId(id: Prisma.TagNameWhereUniqueInput) {
+    const datum = await this.getTag();
+    if (!datum) {
+      return '';
+    }
+    console.log(JSON.stringify(datum));
     const data = this.prismaService.tagName.findUnique({ where: id });
 
     if (!data) {

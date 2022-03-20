@@ -44,8 +44,20 @@ CREATE TABLE "QrlakeData" (
     "like" BOOLEAN DEFAULT false,
     "dislike" BOOLEAN DEFAULT false,
     "userId" INTEGER NOT NULL,
+    "tagNameId" INTEGER,
 
     CONSTRAINT "QrlakeData_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "TagName" (
+    "id" SERIAL NOT NULL,
+    "tagName" TEXT NOT NULL,
+    "lat" DECIMAL(65,30),
+    "long" DECIMAL(65,30),
+    "userId" INTEGER,
+
+    CONSTRAINT "TagName_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -54,8 +66,20 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 -- CreateIndex
 CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "TagName_lat_key" ON "TagName"("lat");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "TagName_long_key" ON "TagName"("long");
+
 -- AddForeignKey
 ALTER TABLE "Otp" ADD CONSTRAINT "Otp_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "QrlakeData" ADD CONSTRAINT "QrlakeData_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "QrlakeData" ADD CONSTRAINT "QrlakeData_tagNameId_fkey" FOREIGN KEY ("tagNameId") REFERENCES "TagName"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "TagName" ADD CONSTRAINT "TagName_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

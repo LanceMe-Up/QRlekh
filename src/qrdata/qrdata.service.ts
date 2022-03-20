@@ -26,12 +26,14 @@ export class QrdataService {
   }
 
   async get() {
-    return this.prismaService.qrlakeData.findMany({
+    const data = this.prismaService.qrlakeData.findMany({
       include: {
         user: true,
         TagName: true,
       },
     });
+
+    return data;
   }
 
   async deleteData(id: number) {

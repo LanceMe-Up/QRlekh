@@ -11,10 +11,10 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-    .setTitle('Qrlake')
-    .setDescription('The project of Qrlake...')
+    .setTitle('Qrlekh')
+    .setDescription('The project of Qrlekh...')
     .setVersion('1.0')
-    .addTag('qrlake')
+    .addTag('qrlekh')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

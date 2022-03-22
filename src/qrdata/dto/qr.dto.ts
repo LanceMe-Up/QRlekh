@@ -3,7 +3,7 @@ import { IsEmpty, IsOptional, IsString } from 'class-validator';
 
 export class QrDto {
   @IsString()
-  @ApiProperty({ example: 'Temple', description: 'Name of Qrlake Info' })
+  @ApiProperty({ example: 'Temple', description: 'Name of Qrlekh Info' })
   name: string;
 
   @IsString()

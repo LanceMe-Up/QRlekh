@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsString } from 'class-validator';
+import { IsDecimal, IsString } from 'class-validator';
 
 export class TagDto {
   @ApiProperty({ example: 'Temple', description: 'Tag For' })
@@ -7,10 +7,10 @@ export class TagDto {
   tagName: string;
 
   @ApiProperty({ example: '12.058755', description: 'latitude number' })
-  @IsNumber()
+  @IsDecimal()
   lat: number;
 
   @ApiProperty({ example: '26.058755', description: 'longitude number' })
-  @IsNumber()
+  @IsDecimal()
   long: number;
 }

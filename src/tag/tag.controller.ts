@@ -40,6 +40,14 @@ export class TagController {
     return this.tagService.getTagId({ id: +id });
   }
 
+  @Get('location/data/:lat/:long')
+  async calculateDataahah(
+    @Param('lat') lat: string,
+    @Param('long') long: string,
+  ) {
+    return this.tagService.distanceDB(+lat, +long);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get(':lat/:long')
   async getByTagLat(@Param('lat') lat: string, @Param('long') long: string) {

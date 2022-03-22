@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { TagNotFoundException } from './tag.exception';
+import * as geolib from 'geolib';
 
 @Injectable()
 export class TagService {
@@ -28,12 +29,36 @@ export class TagService {
 
   async getTag() {
     const data = await this.prismaService.tagName.findMany({
-      include: {
-        User: true,
-      },
+      // include: {
+      //   User: true,
+      // },
     });
 
     return { count: data.length, data };
+  }
+
+  async distanceDB(lat: any, long: any) {
+    const tagData = await this.getTag();
+    const newData = tagData.data.map((i: any) => {
+      const distance = this.caluclateDistance(lat, long, i.lat, i.long);
+      return {
+        distance,
+        ...i,
+      };
+    });
+    return newData;
+  }
+
+  caluclateDistance(ulat: any, ulong: any, dblat: any, dblong: any) {
+    // const abc = this.distanceDB(ulat, ulong);
+    // console.log(abc);
+
+    const data = geolib.getDistance(
+      { latitude: ulat, longitude: ulong },
+      { latitude: dblat, longitude: dblong },
+    );
+
+    return data;
   }
 
   async getTaging(lat: number, long: number) {
@@ -42,10 +67,10 @@ export class TagService {
         AND: [
           {
             lat: {
-              gte: lat,
+              lte: lat,
             },
             long: {
-              gte: long,
+              lte: long,
             },
           },
         ],

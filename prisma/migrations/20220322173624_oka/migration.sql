@@ -31,7 +31,7 @@ CREATE TABLE "Otp" (
 );
 
 -- CreateTable
-CREATE TABLE "QrlakeData" (
+CREATE TABLE "QrlekhData" (
     "id" SERIAL NOT NULL,
     "category" TEXT NOT NULL,
     "knownFor" TEXT NOT NULL,
@@ -46,7 +46,7 @@ CREATE TABLE "QrlakeData" (
     "userId" INTEGER NOT NULL,
     "tagNameId" INTEGER,
 
-    CONSTRAINT "QrlakeData_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "QrlekhData_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -76,10 +76,10 @@ CREATE UNIQUE INDEX "TagName_long_key" ON "TagName"("long");
 ALTER TABLE "Otp" ADD CONSTRAINT "Otp_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QrlakeData" ADD CONSTRAINT "QrlakeData_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "QrlekhData" ADD CONSTRAINT "QrlekhData_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QrlakeData" ADD CONSTRAINT "QrlakeData_tagNameId_fkey" FOREIGN KEY ("tagNameId") REFERENCES "TagName"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "QrlekhData" ADD CONSTRAINT "QrlekhData_tagNameId_fkey" FOREIGN KEY ("tagNameId") REFERENCES "TagName"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TagName" ADD CONSTRAINT "TagName_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

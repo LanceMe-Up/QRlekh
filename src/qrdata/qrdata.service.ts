@@ -7,11 +7,11 @@ export class QrdataService {
   constructor(private prismaService: PrismaService) {}
 
   async createQr(
-    createQr: Prisma.QrlakeDataCreateInput,
+    createQr: Prisma.QrlekhDataCreateInput,
     id: number,
     tagId: number,
   ) {
-    return this.prismaService.qrlakeData.create({
+    return this.prismaService.qrlekhData.create({
       data: {
         desc: createQr.desc,
         name: createQr.name,
@@ -26,7 +26,7 @@ export class QrdataService {
   }
 
   async get() {
-    const data = this.prismaService.qrlakeData.findMany({
+    const data = this.prismaService.qrlekhData.findMany({
       include: {
         user: true,
         TagName: true,
@@ -37,7 +37,7 @@ export class QrdataService {
   }
 
   async deleteData(id: number) {
-    await this.prismaService.qrlakeData.delete({
+    await this.prismaService.qrlekhData.delete({
       where: { id: Number(id) },
     });
 

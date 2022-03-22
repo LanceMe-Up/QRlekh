@@ -11,14 +11,14 @@ import { RoleDto } from './role.dto';
 export class CreateUserDto {
   @IsString()
   @ApiProperty({
-    example: 'kishor',
+    example: 'nirajan',
     description: 'should be enter full name',
   })
   readonly username: string;
 
   @IsEmail()
   @ApiProperty({
-    example: 'kishor@gmail.com',
+    example: 'nirajankc360@gmail.com',
     description: 'should be enter email',
   })
   readonly email: string;

@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma.service';
 
 import { OtpType, Prisma } from '@prisma/client';
 
-import { hashSync } from 'bcrypt';
+import { hashSync, hash } from 'bcrypt';
 import { OtpService } from '../otp/otp.service';
 
 @Injectable()
@@ -84,5 +84,14 @@ export class UserService {
         password: hashSync(newPassword, 3),
       },
     );
+  }
+
+  async updateRefreshTokenById(refreshToken: string, id: string) {
+    return await this.prisma.user.update({
+      where: { id: Number(id) },
+      data: {
+        refreshToken: refreshToken ? await hash(refreshToken, 10) : null,
+      },
+    });
   }
 }

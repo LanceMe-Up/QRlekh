@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Decimal } from '@prisma/client/runtime';
 import { IsDecimal, IsString } from 'class-validator';
 
 export class TagDto {
@@ -8,9 +9,9 @@ export class TagDto {
 
   @ApiProperty({ example: '12.058755', description: 'latitude number' })
   @IsDecimal()
-  lat: number;
+  lat: Decimal;
 
   @ApiProperty({ example: '26.058755', description: 'longitude number' })
   @IsDecimal()
-  long: number;
+  long: Decimal;
 }

@@ -3,10 +3,10 @@ import {
   Controller,
   Get,
   Post,
-  UseGuards,
   Request,
   Delete,
   Param,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../@guards/jwt.guard';
@@ -22,16 +22,25 @@ export class QrdataController {
 
   @Post()
   async create(@Body() createDto: QrDto, @Request() req: any) {
-    return await this.qrService.createQr(
-      { ...createDto },
-      req.user.id,
-      +createDto.tagNameId,
-    );
+    try {
+      return await this.qrService.createQr(
+        { ...createDto },
+        req.user.id,
+        +createDto.tagNameId,
+      );
+    } catch (e) {
+      return { log: e.message };
+    }
   }
 
   @Get()
   async get() {
     return await this.qrService.get();
+  }
+
+  @Get('/:slug/data')
+  getSlug(@Param('slug') slug: string) {
+    return this.qrService.getBySlug(slug);
   }
 
   @Delete(':id')

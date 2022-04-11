@@ -22,6 +22,7 @@ model User {
   email                  String   @unique
   phone                  String   @unique
   password               String
+  refreshToken           String?
   // App related details
   role                   UserRole @default(USER)
   verified               Boolean  @default(false)
@@ -53,6 +54,7 @@ model QrlekhData {
   id        Int      @id @default(autoincrement())
   category  String
   knownFor  String
+  slug      String   @unique
   image     String?
   location  String
   rating    Int?     @default(1)

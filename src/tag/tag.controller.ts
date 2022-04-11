@@ -7,6 +7,7 @@ import {
   Post,
   UseGuards,
   Delete,
+  NotFoundException,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger/dist/decorators/api-bearer.decorator';
 import { UserRole } from '@prisma/client';
@@ -31,7 +32,10 @@ export class TagController {
   @Get()
   @UseGuards(JwtAuthGuard)
   async getAll() {
-    return this.tagService.getTag();
+    const data = await this.tagService.getTag();
+
+    if (!data) throw new NotFoundException("Tag doesn't exists!");
+    return data;
   }
 
   @UseGuards(JwtAuthGuard)

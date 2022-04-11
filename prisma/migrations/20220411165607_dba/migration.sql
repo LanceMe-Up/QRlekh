@@ -11,6 +11,7 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "password" TEXT NOT NULL,
+    "refreshToken" TEXT,
     "role" "UserRole" NOT NULL DEFAULT E'USER',
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "passwordResetRequested" BOOLEAN NOT NULL DEFAULT false,
@@ -35,6 +36,7 @@ CREATE TABLE "QrlekhData" (
     "id" SERIAL NOT NULL,
     "category" TEXT NOT NULL,
     "knownFor" TEXT NOT NULL,
+    "slug" TEXT NOT NULL,
     "image" TEXT,
     "location" TEXT NOT NULL,
     "rating" INTEGER DEFAULT 1,
@@ -65,6 +67,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "QrlekhData_slug_key" ON "QrlekhData"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TagName_lat_key" ON "TagName"("lat");

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { TagNotFoundException } from './tag.exception';
@@ -9,14 +9,18 @@ export class TagService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async createTag(tag: Prisma.TagNameCreateInput, user: any) {
-    return this.prismaService.tagName.create({
-      data: {
-        tagName: tag.tagName,
-        userId: user,
-        lat: tag.lat,
-        long: tag.long,
-      },
-    });
+    try {
+      return this.prismaService.tagName.create({
+        data: {
+          tagName: tag.tagName,
+          userId: user,
+          lat: tag.lat,
+          long: tag.long,
+        },
+      });
+    } catch (e) {
+      return { log: e.message };
+    }
   }
 
   async getNearTag(where: Prisma.TagNameWhereUniqueInput) {
@@ -29,9 +33,9 @@ export class TagService {
 
   async getTag() {
     const data = await this.prismaService.tagName.findMany({
-      // include: {
-      //   User: true,
-      // },
+      include: {
+        User: true,
+      },
     });
 
     return { count: data.length, data };
@@ -46,6 +50,7 @@ export class TagService {
         ...i,
       };
     });
+    if (!newData) throw new BadRequestException();
     return newData;
   }
 

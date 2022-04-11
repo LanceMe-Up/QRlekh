@@ -1,19 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
+import { SlugifyService } from '../slugify.service';
 
 @Injectable()
 export class QrdataService {
-  constructor(private prismaService: PrismaService) {}
+  constructor(
+    private readonly prismaService: PrismaService,
+    private readonly slugifyService: SlugifyService,
+  ) {}
 
   async createQr(
     createQr: Prisma.QrlekhDataCreateInput,
     id: number,
     tagId: number,
   ) {
+    const slug: string = this.slugifyService.toSlug(createQr.name);
     return this.prismaService.qrlekhData.create({
       data: {
         desc: createQr.desc,
+        slug,
         name: createQr.name,
         category: createQr.category,
         knownFor: createQr.knownFor,
@@ -30,6 +36,35 @@ export class QrdataService {
       include: {
         user: true,
         TagName: true,
+      },
+    });
+
+    return data;
+  }
+
+  async getBySlug(slug: string) {
+    const data = this.prismaService.qrlekhData.findMany({
+      where: {
+        slug,
+      },
+      select: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            email: true,
+            role: true,
+          },
+        },
+        TagName: {
+          select: {
+            id: true,
+            tagName: true,
+            lat: true,
+            long: true,
+            userId: true,
+          },
+        },
       },
     });
 

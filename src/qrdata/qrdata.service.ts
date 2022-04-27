@@ -47,13 +47,12 @@ export class QrdataService {
       where: {
         slug,
       },
-      select: {
+      include: {
         user: {
           select: {
             id: true,
             username: true,
             email: true,
-            role: true,
           },
         },
         TagName: {

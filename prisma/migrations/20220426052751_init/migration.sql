@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'USER');
+CREATE TYPE "UserRole" AS ENUM ('ADMIN', 'USER', 'VENDOR');
 
 -- CreateEnum
 CREATE TYPE "OtpType" AS ENUM ('EMAIL_VERIFICATION', 'PASSWORD_RESET');
@@ -11,10 +11,10 @@ CREATE TABLE "User" (
     "email" TEXT NOT NULL,
     "phone" TEXT NOT NULL,
     "password" TEXT NOT NULL,
-    "refreshToken" TEXT,
     "role" "UserRole" NOT NULL DEFAULT E'USER',
     "verified" BOOLEAN NOT NULL DEFAULT false,
     "passwordResetRequested" BOOLEAN NOT NULL DEFAULT false,
+    "refreshToken" TEXT,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -37,7 +37,6 @@ CREATE TABLE "QrlekhData" (
     "category" TEXT NOT NULL,
     "knownFor" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
-    "image" TEXT,
     "location" TEXT NOT NULL,
     "rating" INTEGER DEFAULT 1,
     "name" TEXT NOT NULL,
@@ -47,8 +46,19 @@ CREATE TABLE "QrlekhData" (
     "dislike" BOOLEAN DEFAULT false,
     "userId" INTEGER NOT NULL,
     "tagNameId" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "QrlekhData_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "QrlekhImage" (
+    "id" SERIAL NOT NULL,
+    "image" TEXT NOT NULL,
+    "qrlekhDataId" INTEGER NOT NULL,
+
+    CONSTRAINT "QrlekhImage_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -58,6 +68,8 @@ CREATE TABLE "TagName" (
     "lat" DECIMAL(65,30),
     "long" DECIMAL(65,30),
     "userId" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
 
     CONSTRAINT "TagName_pkey" PRIMARY KEY ("id")
 );
@@ -70,6 +82,9 @@ CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "QrlekhData_slug_key" ON "QrlekhData"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "QrlekhImage_qrlekhDataId_key" ON "QrlekhImage"("qrlekhDataId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TagName_lat_key" ON "TagName"("lat");
@@ -85,6 +100,9 @@ ALTER TABLE "QrlekhData" ADD CONSTRAINT "QrlekhData_userId_fkey" FOREIGN KEY ("u
 
 -- AddForeignKey
 ALTER TABLE "QrlekhData" ADD CONSTRAINT "QrlekhData_tagNameId_fkey" FOREIGN KEY ("tagNameId") REFERENCES "TagName"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "QrlekhImage" ADD CONSTRAINT "QrlekhImage_qrlekhDataId_fkey" FOREIGN KEY ("qrlekhDataId") REFERENCES "QrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TagName" ADD CONSTRAINT "TagName_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;

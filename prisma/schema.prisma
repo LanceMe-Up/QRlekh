@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,33 +7,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  ADMIN
-  USER
-}
-
 model User {
-  // General details
-  id                     Int      @id @default(autoincrement())
+  id                     Int          @id @default(autoincrement())
   username               String
-  email                  String   @unique
-  phone                  String   @unique
+  email                  String       @unique
+  phone                  String       @unique
   password               String
+  role                   UserRole     @default(USER)
+  verified               Boolean      @default(false)
+  passwordResetRequested Boolean      @default(false)
   refreshToken           String?
-  // App related details
-  role                   UserRole @default(USER)
-  verified               Boolean  @default(false)
   otp                    Otp[]
-  // Configurations
-  passwordResetRequested Boolean  @default(false)
-
-  qr  QrlekhData[]
-  tag TagName[]
-}
-
-enum OtpType {
-  EMAIL_VERIFICATION
-  PASSWORD_RESET
+  qr                     QrlekhData[]
+  tag                    TagName[]
 }
 
 model Otp {
@@ -45,40 +28,60 @@ model Otp {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   type      OtpType
-  // The user associated with the OTP code
   userId    Int
   user      User     @relation(fields: [userId], references: [id])
 }
 
 model QrlekhData {
-  id        Int      @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   category  String
   knownFor  String
-  slug      String   @unique
-  image     String?
+  slug      String       @unique
+  image     QrlekhImage?
   location  String
-  rating    Int?     @default(1)
+  rating    Int?         @default(1)
   name      String
   desc      String
-  favourite Boolean? @default(false)
-  like      Boolean? @default(false)
-  dislike   Boolean? @default(false)
-
-  user   User @relation(fields: [userId], references: [id])
-  userId Int
-
-  TagName   TagName? @relation(fields: [tagNameId], references: [id])
+  favourite Boolean?     @default(false)
+  like      Boolean?     @default(false)
+  dislike   Boolean?     @default(false)
+  userId    Int
   tagNameId Int?
+  TagName   TagName?     @relation(fields: [tagNameId], references: [id])
+  user      User         @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model QrlekhImage {
+  id    Int    @id @default(autoincrement())
+  image String
+
+  qrlekhData   QrlekhData @relation(fields: [qrlekhDataId], references: [id])
+  qrlekhDataId Int        @unique
 }
 
 model TagName {
-  id      Int      @id @default(autoincrement())
+  id      Int          @id @default(autoincrement())
   tagName String
-  lat     Decimal? @unique
-  long    Decimal? @unique
+  lat     Decimal?     @unique
+  long    Decimal?     @unique
+  userId  Int?
+  User    User?        @relation(fields: [userId], references: [id])
+  qr      QrlekhData[]
 
-  User   User? @relation(fields: [userId], references: [id])
-  userId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 
-  qr QrlekhData[]
+enum UserRole {
+  ADMIN
+  USER
+  VENDOR
+}
+
+enum OtpType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
 }

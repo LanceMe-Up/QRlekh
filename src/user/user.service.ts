@@ -15,7 +15,17 @@ export class UserService {
   constructor(private prisma: PrismaService, private otpService: OtpService) {}
 
   async getUser(where: Prisma.UserWhereUniqueInput) {
-    return this.prisma.user.findUnique({ where });
+    return this.prisma.user.findUnique({
+      where,
+      include: {
+        profileImage: {
+          select: {
+            image: true,
+            id: true,
+          },
+        },
+      },
+    });
   }
 
   async createUser(data: Prisma.UserCreateInput) {
@@ -93,5 +103,35 @@ export class UserService {
         refreshToken: refreshToken ? await hash(refreshToken, 10) : null,
       },
     });
+  }
+
+  async setProfile(image: any, userId: any) {
+    try {
+      const profile = await this.prisma.profileImage.create({
+        data: {
+          image,
+          userId,
+        },
+      });
+      return profile;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async updateProfile(image: any, id: number) {
+    try {
+      const profile = await this.prisma.profileImage.update({
+        where: {
+          id,
+        },
+        data: {
+          image,
+        },
+      });
+      return profile;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
   }
 }

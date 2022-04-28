@@ -8,18 +8,27 @@ datasource db {
 }
 
 model User {
-  id                     Int          @id @default(autoincrement())
+  id                     Int           @id @default(autoincrement())
   username               String
-  email                  String       @unique
-  phone                  String       @unique
+  email                  String        @unique
+  phone                  String        @unique
   password               String
-  role                   UserRole     @default(USER)
-  verified               Boolean      @default(false)
-  passwordResetRequested Boolean      @default(false)
+  role                   UserRole      @default(USER)
+  profileImage           ProfileImage?
+  verified               Boolean       @default(false)
+  passwordResetRequested Boolean       @default(false)
   refreshToken           String?
   otp                    Otp[]
-  qr                     QrlekhData[]
-  tag                    TagName[]
+  qrlekhData             QrlekhData[]
+  tagName                TagName[]
+}
+
+model ProfileImage {
+  id    Int    @id @default(autoincrement())
+  image String
+
+  user   User? @relation(fields: [userId], references: [id])
+  userId Int?  @unique
 }
 
 model Otp {
@@ -39,16 +48,18 @@ model QrlekhData {
   slug      String       @unique
   image     QrlekhImage?
   location  String
-  rating    Int?         @default(1)
+  rating    Int          @default(4)
   name      String
   desc      String
-  favourite Boolean?     @default(false)
-  like      Boolean?     @default(false)
-  dislike   Boolean?     @default(false)
-  userId    Int
+  favourite Boolean      @default(false)
+  like      Boolean      @default(false)
+  dislike   Boolean      @default(false)
+
+  TagName   TagName? @relation(fields: [tagNameId], references: [id])
   tagNameId Int?
-  TagName   TagName?     @relation(fields: [tagNameId], references: [id])
-  user      User         @relation(fields: [userId], references: [id])
+
+  User   User? @relation(fields: [userId], references: [id])
+  userId Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -58,15 +69,15 @@ model QrlekhImage {
   id    Int    @id @default(autoincrement())
   image String
 
-  qrlekhData   QrlekhData @relation(fields: [qrlekhDataId], references: [id])
+  QrlekhData   QrlekhData @relation(fields: [qrlekhDataId], references: [id])
   qrlekhDataId Int        @unique
 }
 
 model TagName {
   id      Int          @id @default(autoincrement())
   tagName String
-  lat     Decimal?     @unique
-  long    Decimal?     @unique
+  lat     Decimal     @unique
+  long    Decimal     @unique
   userId  Int?
   User    User?        @relation(fields: [userId], references: [id])
   qr      QrlekhData[]

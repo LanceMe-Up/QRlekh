@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { SlugifyService } from '../slugify.service';
@@ -12,62 +12,82 @@ export class QrdataService {
 
   async createQr(
     createQr: Prisma.QrlekhDataCreateInput,
-    id: number,
-    tagId: number,
+    userId: any,
+    tagNameId: any,
   ) {
-    const slug: string = this.slugifyService.toSlug(createQr.name);
-    return this.prismaService.qrlekhData.create({
-      data: {
-        desc: createQr.desc,
-        slug,
-        name: createQr.name,
-        category: createQr.category,
-        knownFor: createQr.knownFor,
-        location: createQr.location,
-        rating: createQr.rating,
-        userId: id,
-        tagNameId: tagId,
-      },
-    });
+    try {
+      const slug: string = this.slugifyService.toSlug(createQr.name);
+      return await this.prismaService.qrlekhData.create({
+        data: {
+          category: createQr.category,
+          knownFor: createQr.knownFor,
+          location: createQr.location,
+          slug,
+          rating: createQr.rating,
+          name: createQr.name,
+          desc: createQr.desc,
+          favourite: createQr.favourite,
+          like: createQr.like,
+          dislike: createQr.dislike,
+          userId,
+          tagNameId,
+        },
+      });
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
   }
 
   async get() {
-    const data = this.prismaService.qrlekhData.findMany({
+    const data = await this.prismaService.qrlekhData.findMany({
       include: {
-        user: true,
+        User: {
+          select: {
+            username: true,
+            id: true,
+          },
+        },
         TagName: true,
+        image: {
+          select: {
+            image: true,
+          },
+        },
       },
     });
 
-    return data;
+    return { count: data.length, data };
   }
 
   async getBySlug(slug: string) {
-    const data = this.prismaService.qrlekhData.findMany({
-      where: {
-        slug,
-      },
-      include: {
-        user: {
-          select: {
-            id: true,
-            username: true,
-            email: true,
+    try {
+      const data = this.prismaService.qrlekhData.findMany({
+        where: {
+          slug,
+        },
+        include: {
+          User: {
+            select: {
+              id: true,
+              username: true,
+              email: true,
+            },
+          },
+          TagName: {
+            select: {
+              id: true,
+              tagName: true,
+              lat: true,
+              long: true,
+              userId: true,
+            },
           },
         },
-        TagName: {
-          select: {
-            id: true,
-            tagName: true,
-            lat: true,
-            long: true,
-            userId: true,
-          },
-        },
-      },
-    });
-
-    return data;
+      });
+      return data;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
   }
 
   async deleteData(id: number) {
@@ -76,5 +96,35 @@ export class QrdataService {
     });
 
     return { success: true, data: `Delete with id ${id}` };
+  }
+
+  async setQrlekhImage(image: any, qrlekhDataId: any) {
+    try {
+      const profile = this.prismaService.qrlekhImage.create({
+        data: {
+          image,
+          qrlekhDataId,
+        },
+      });
+      return profile;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async updateQrlekhImage(image: any, id: number) {
+    try {
+      const profile = this.prismaService.qrlekhImage.update({
+        where: {
+          id,
+        },
+        data: {
+          image,
+        },
+      });
+      return profile;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
   }
 }

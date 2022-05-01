@@ -36,7 +36,18 @@ export class UsersController {
     return safeDetails;
   }
 
-  @Post('/profile')
+  @Get(':id/name')
+  async getUserById(@Param('id') id: number) {
+    const user = await this.userService.getUser({ id });
+    if (!user) throw new NotFoundException("User doesn't exists!");
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...safeDetails } = user;
+    console.log(`${user.password} ${user.email}`);
+    return safeDetails;
+  }
+
+  @Post('profile')
   @UseInterceptors(
     FileInterceptor('image', {
       storage: diskStorage({
@@ -48,7 +59,7 @@ export class UsersController {
   )
   async create(@UploadedFile() file: Express.Multer.File, @Request() req: any) {
     const image = `${process.env.HOST}/static/upload/${file.filename}`;
-    return await this.userService.setProfile(image, req.user.id);
+    return await this.userService.setProfile(image, +req.user.id);
   }
 
   @Patch('/update-profile/:id')
@@ -67,6 +78,6 @@ export class UsersController {
     @Param('id') id: number,
   ) {
     const image = `${process.env.HOST}/static/upload/${file.filename}`;
-    return await this.userService.updateProfile(image, id);
+    return await this.userService.updateProfile(image, +id);
   }
 }

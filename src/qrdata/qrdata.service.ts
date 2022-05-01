@@ -39,14 +39,24 @@ export class QrdataService {
   }
 
   async get() {
-    const data = this.prismaService.qrlekhData.findMany({
+    const data = await this.prismaService.qrlekhData.findMany({
       include: {
-        User: true,
+        User: {
+          select: {
+            username: true,
+            id: true,
+          },
+        },
         TagName: true,
+        image: {
+          select: {
+            image: true,
+          },
+        },
       },
     });
 
-    return data;
+    return { count: data.length, data };
   }
 
   async getBySlug(slug: string) {
@@ -86,5 +96,35 @@ export class QrdataService {
     });
 
     return { success: true, data: `Delete with id ${id}` };
+  }
+
+  async setQrlekhImage(image: any, qrlekhDataId: any) {
+    try {
+      const profile = this.prismaService.qrlekhImage.create({
+        data: {
+          image,
+          qrlekhDataId,
+        },
+      });
+      return profile;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async updateQrlekhImage(image: any, id: number) {
+    try {
+      const profile = this.prismaService.qrlekhImage.update({
+        where: {
+          id,
+        },
+        data: {
+          image,
+        },
+      });
+      return profile;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
   }
 }

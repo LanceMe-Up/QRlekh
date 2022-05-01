@@ -121,7 +121,7 @@ export class UserService {
 
   async updateProfile(image: any, id: number) {
     try {
-      const profile = await this.prisma.profileImage.update({
+      const profile = this.prisma.profileImage.update({
         where: {
           id,
         },

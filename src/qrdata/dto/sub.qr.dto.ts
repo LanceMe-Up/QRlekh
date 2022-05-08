@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
-export class QrDto {
+export class SubQrDto {
   @IsString()
   @ApiProperty({ example: 'Mai Temple', description: 'Known For' })
   knownFor: string;
@@ -32,6 +32,11 @@ export class QrDto {
   })
   desc: string;
 
+  // @IsNumber()
+  // @IsOptional()
+  // @ApiProperty({ minLength: 1, maxLength: 5, default: 1 })
+  // rating: number;
+
   @IsOptional()
   @IsBoolean()
   @ApiProperty({ default: false })
@@ -43,5 +48,5 @@ export class QrDto {
   dislike: boolean;
 
   @IsNumber()
-  categoryId: number;
+  qrlekhDataId: number;
 }

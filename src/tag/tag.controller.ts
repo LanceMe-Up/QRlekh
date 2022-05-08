@@ -1,20 +1,20 @@
 import {
   Body,
   Controller,
-  Request,
   Get,
-  Param,
   Post,
   UseGuards,
-  Delete,
   NotFoundException,
+  Patch,
+  Param,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger/dist/decorators/api-bearer.decorator';
 import { UserRole } from '@prisma/client';
 import { JwtAuthGuard } from '../@guards/jwt.guard';
 import { RolesGuard } from '../@guards/roles.guard';
 import { Roles } from '../roles.decorates';
-import { TagDto } from './tag.dto';
+import { TagDto } from './dto/tag.dto';
+import { UpdateTagDto } from './dto/update.tag.dto';
 import { TagService } from './tag.service';
 
 @ApiBearerAuth()
@@ -25,8 +25,20 @@ export class TagController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  async create(@Body() dto: TagDto, @Request() req) {
-    return this.tagService.createTag(dto, req.user.id);
+  async create(@Body() dto: TagDto) {
+    return this.tagService.createTag(dto, dto.subtagId, dto.qrlekhId);
+  }
+
+  @Patch(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async update(@Body() dto: UpdateTagDto, @Param('id') id: string) {
+    return this.tagService.updateTag(
+      dto,
+      { id: +id },
+      dto.subtagId,
+      dto.qrlekhId,
+    );
   }
 
   @Get()
@@ -38,30 +50,30 @@ export class TagController {
     return data;
   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get(':id')
-  async getById(@Param('id') id: string) {
-    return this.tagService.getTagId({ id: +id });
-  }
+  //   @UseGuards(JwtAuthGuard)
+  //   @Get(':id')
+  //   async getById(@Param('id') id: string) {
+  //     return this.tagService.getTagId({ id: +id });
+  //   }
 
-  @Get('location/data/:lat/:long')
-  async calculateDataahah(
-    @Param('lat') lat: string,
-    @Param('long') long: string,
-  ) {
-    return this.tagService.distanceDB(+lat, +long);
-  }
+  //   @Get('location/data/:lat/:long')
+  //   async calculateDataahah(
+  //     @Param('lat') lat: string,
+  //     @Param('long') long: string,
+  //   ) {
+  //     return this.tagService.distanceDB(+lat, +long);
+  //   }
 
-  @UseGuards(JwtAuthGuard)
-  @Get(':lat/:long')
-  async getByTagLat(@Param('lat') lat: string, @Param('long') long: string) {
-    return this.tagService.getTaging(+lat, +long);
-  }
+  // @UseGuards(JwtAuthGuard)
+  // @Get(':lat/:long')
+  // async getByTagLat(@Param('lat') lat: string, @Param('long') long: string) {
+  //   return this.tagService.getTaging(+lat, +long);
+  // }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @Delete(':id')
-  async deleteData(@Param('id') id: number) {
-    return await this.tagService.deleteTag(id);
-  }
+  //   @UseGuards(JwtAuthGuard, RolesGuard)
+  //   @Roles(UserRole.ADMIN)
+  //   @Delete(':id')
+  //   async deleteData(@Param('id') id: number) {
+  //     return await this.tagService.deleteTag(id);
+  //   }
 }

@@ -5,7 +5,6 @@ import {
   Post,
   Patch,
   Request,
-  Delete,
   Param,
   UseGuards,
   UploadedFile,
@@ -20,6 +19,8 @@ import { RolesGuard } from '../@guards/roles.guard';
 import { imageFileFilter, validateFileName } from '../photo-validate';
 import { Roles } from '../roles.decorates';
 import { QrDto } from './dto/qr.dto';
+import { SubQrDto } from './dto/sub.qr.dto';
+// import { SubQrDto } from './dto/sub.qr.dto';
 
 import { QrdataService } from './qrdata.service';
 
@@ -31,14 +32,31 @@ export class QrdataController {
 
   @Post()
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
   create(@Body() data: QrDto, @Request() req: any) {
-    return this.qrService.createQr(data, req.user.id, data.tagNameId);
+    return this.qrService.createQr(data, req.user.id, data.categoryId);
   }
 
   @Get()
   async get() {
     return await this.qrService.get();
+  }
+
+  @Post('/sub-module')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  createSub(@Body() data: SubQrDto, @Request() req: any) {
+    return this.qrService.createSubQr(data, req.user.id, data.qrlekhDataId);
+  }
+
+  @Get('/sub-module')
+  async getSub() {
+    return await this.qrService.getSubQr();
+  }
+
+  @Get('/:id')
+  getById(@Param('id') id: string) {
+    return this.qrService.getById({ id: Number(id) });
   }
 
   @Get('/:slug/data')
@@ -61,7 +79,7 @@ export class QrdataController {
     @Body('qrlekhDataId') qrlekhDataId: any,
   ) {
     const image = `${process.env.HOST}/static/upload/${file.filename}`;
-    return this.qrService.setQrlekhImage(image, Number(qrlekhDataId));
+    return this.qrService.setQrlekhImage(image, Number(qrlekhDataId), null);
   }
 
   @Patch('/update-image/:id')
@@ -83,10 +101,10 @@ export class QrdataController {
     return await this.qrService.updateQrlekhImage(image, +id);
   }
 
-  @Delete(':id')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN)
-  async deleteData(@Param('id') id: number) {
-    return await this.qrService.deleteData(id);
-  }
+  // @Delete(':id')
+  // @UseGuards(RolesGuard)
+  // @Roles(UserRole.ADMIN)
+  // async deleteData(@Param('id') id: number) {
+  //   return await this.qrService.deleteData(id);
+  // }
 }

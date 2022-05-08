@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
+// import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma.service';
 import { SlugifyService } from '../slugify.service';
 
@@ -13,24 +14,21 @@ export class QrdataService {
   async createQr(
     createQr: Prisma.QrlekhDataCreateInput,
     userId: any,
-    tagNameId: any,
+    categoryId: any,
   ) {
     try {
-      const slug: string = this.slugifyService.toSlug(createQr.name);
+      const slug: string = this.slugifyService.toSlug(createQr.title);
       return await this.prismaService.qrlekhData.create({
         data: {
-          category: createQr.category,
           knownFor: createQr.knownFor,
-          location: createQr.location,
+          title: createQr.title,
           slug,
-          rating: createQr.rating,
-          name: createQr.name,
+          location: createQr.location,
           desc: createQr.desc,
-          favourite: createQr.favourite,
           like: createQr.like,
           dislike: createQr.dislike,
           userId,
-          tagNameId,
+          categoryId,
         },
       });
     } catch (e) {
@@ -44,19 +42,100 @@ export class QrdataService {
         User: {
           select: {
             username: true,
+            email: true,
             id: true,
           },
         },
-        TagName: true,
         image: {
           select: {
             image: true,
           },
         },
+        gallery: {
+          select: {
+            gallery: true,
+          },
+        },
+        qrReviews: {
+          select: {
+            rating: true,
+            israting: true,
+            desc: true,
+            User: {
+              select: {
+                username: true,
+                email: true,
+                id: true,
+              },
+            },
+          },
+        },
+        tag: {
+          select: {
+            tagName: true,
+          },
+        },
+        qrBookmark: true,
+        favourite: true,
+        subQrlekh: true,
       },
     });
 
     return { count: data.length, data };
+  }
+
+  async getById(id: Prisma.QrlekhDataWhereUniqueInput) {
+    try {
+      const data = this.prismaService.qrlekhData.findMany({
+        where: {
+          id: id.id,
+        },
+        include: {
+          User: {
+            select: {
+              username: true,
+              email: true,
+              id: true,
+            },
+          },
+          image: {
+            select: {
+              image: true,
+            },
+          },
+          gallery: {
+            select: {
+              gallery: true,
+            },
+          },
+          qrReviews: {
+            select: {
+              rating: true,
+              israting: true,
+              desc: true,
+              User: {
+                select: {
+                  username: true,
+                  email: true,
+                  id: true,
+                },
+              },
+            },
+          },
+          tag: {
+            select: {
+              tagName: true,
+            },
+          },
+          qrBookmark: true,
+          favourite: true,
+          subQrlekh: true,
+        },
+      });
+      return data;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
   }
 
   async getBySlug(slug: string) {
@@ -68,20 +147,43 @@ export class QrdataService {
         include: {
           User: {
             select: {
-              id: true,
               username: true,
               email: true,
-            },
-          },
-          TagName: {
-            select: {
               id: true,
-              tagName: true,
-              lat: true,
-              long: true,
-              userId: true,
             },
           },
+          image: {
+            select: {
+              image: true,
+            },
+          },
+          gallery: {
+            select: {
+              gallery: true,
+            },
+          },
+          qrReviews: {
+            select: {
+              rating: true,
+              israting: true,
+              desc: true,
+              User: {
+                select: {
+                  username: true,
+                  email: true,
+                  id: true,
+                },
+              },
+            },
+          },
+          tag: {
+            select: {
+              tagName: true,
+            },
+          },
+          qrBookmark: true,
+          favourite: true,
+          subQrlekh: true,
         },
       });
       return data;
@@ -90,20 +192,21 @@ export class QrdataService {
     }
   }
 
-  async deleteData(id: number) {
-    await this.prismaService.qrlekhData.delete({
-      where: { id: Number(id) },
-    });
+  // async deleteData(id: number) {
+  //   await this.prismaService.qrlekhData.delete({
+  //     where: { id: Number(id) },
+  //   });
 
-    return { success: true, data: `Delete with id ${id}` };
-  }
+  //   return { success: true, data: `Delete with id ${id}` };
+  // }
 
-  async setQrlekhImage(image: any, qrlekhDataId: any) {
+  async setQrlekhImage(image: any, qrlekhId: any, subQrImageId: any) {
     try {
       const profile = this.prismaService.qrlekhImage.create({
         data: {
           image,
-          qrlekhDataId,
+          qrlekhId,
+          subQrImageId,
         },
       });
       return profile;
@@ -126,5 +229,84 @@ export class QrdataService {
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
+  }
+
+  // start sub-child
+  async createSubQr(
+    createQr: Prisma.SubQrlekhDataCreateInput,
+    userId: any,
+    qrlekhDataId: any,
+  ) {
+    try {
+      const slug: string = this.slugifyService.toSlug(createQr.title);
+      return await this.prismaService.subQrlekhData.create({
+        data: {
+          knownFor: createQr.knownFor,
+          title: createQr.title,
+          slug,
+          location: createQr.location,
+          desc: createQr.desc,
+          like: createQr.like,
+          dislike: createQr.dislike,
+          userId,
+          qrlekhDataId,
+        },
+      });
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async getSubQr() {
+    const data = await this.prismaService.subQrlekhData.findMany({
+      include: {
+        User: {
+          select: {
+            username: true,
+            email: true,
+            id: true,
+          },
+        },
+        image: {
+          select: {
+            image: true,
+          },
+        },
+        gallery: {
+          select: {
+            gallery: true,
+          },
+        },
+        qrReviews: {
+          select: {
+            rating: true,
+            israting: true,
+            desc: true,
+            User: {
+              select: {
+                username: true,
+                email: true,
+                id: true,
+              },
+            },
+          },
+        },
+        tag: {
+          select: {
+            tagName: true,
+          },
+        },
+        qrBookmark: true,
+        favourite: true,
+        QrlekhData: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+    });
+
+    return { count: data.length, data };
   }
 }

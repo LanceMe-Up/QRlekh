@@ -8,19 +8,23 @@ datasource db {
 }
 
 model User {
-  id                     Int           @id @default(autoincrement())
+  id                     Int             @id @default(autoincrement())
   username               String
-  email                  String        @unique
-  phone                  String        @unique
+  email                  String          @unique
+  phone                  String          @unique
   password               String
-  role                   UserRole      @default(USER)
+  role                   UserRole        @default(USER)
   profileImage           ProfileImage?
-  verified               Boolean       @default(false)
-  passwordResetRequested Boolean       @default(false)
+  verified               Boolean         @default(false)
+  passwordResetRequested Boolean         @default(false)
   refreshToken           String?
   otp                    Otp[]
   qrlekhData             QrlekhData[]
-  tagName                TagName[]
+  Category               Category[]
+  favourite              QrFavourite?
+  qrBookmark             QrBookmark[]
+  review                 QrReviews[]
+  SubQrlekhData          SubQrlekhData[]
 }
 
 model ProfileImage {
@@ -41,58 +45,200 @@ model Otp {
   user      User     @relation(fields: [userId], references: [id])
 }
 
-model QrlekhData {
-  id        Int          @id @default(autoincrement())
-  category  String
-  knownFor  String
-  slug      String       @unique
-  image     QrlekhImage?
-  location  String
-  rating    Int          @default(4)
-  name      String
-  desc      String
-  favourite Boolean      @default(false)
-  like      Boolean      @default(false)
-  dislike   Boolean      @default(false)
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String
 
-  TagName   TagName? @relation(fields: [tagNameId], references: [id])
-  tagNameId Int?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId Int?
+  User   User? @relation(fields: [userId], references: [id])
+
+  qr QrlekhData[]
+}
+
+// parent
+model QrlekhData {
+  id       Int          @id @default(autoincrement())
+  knownFor String
+  title    String       @unique
+  slug     String
+  image    QrlekhImage?
+  location String
+  type     QrType?
+
+  desc String
+
+  like    Boolean @default(false)
+  dislike Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  gallery   QrlekhGallery?
+  favourite QrFavourite?
 
   User   User? @relation(fields: [userId], references: [id])
   userId Int?
 
+  Category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId Int?
+
+  tag TagName?
+
+  qrBookmark QrBookmark?
+
+  qrReviews QrReviews[]
+
+  subQrlekh SubQrlekhData[]
+}
+
+// child
+model SubQrlekhData {
+  id       Int          @id @default(autoincrement())
+  knownFor String
+  title    String       @unique
+  slug     String
+  image    QrlekhImage?
+  location String
+  type     QrType?
+
+  desc String
+
+  like    Boolean @default(false)
+  dislike Boolean @default(false)
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  gallery   QrlekhGallery?
+  favourite QrFavourite?
+
+  User   User? @relation(fields: [userId], references: [id])
+  userId Int?
+
+  tag        TagName?
+  qrBookmark QrBookmark?
+  qrReviews  QrReviews[]
+
+  QrlekhData   QrlekhData? @relation(fields: [qrlekhDataId], references: [id])
+  qrlekhDataId Int?
+}
+
+model QrType {
+  id   Int    @id @default(autoincrement())
+  type String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  qrlekh        QrlekhData     @relation(fields: [qrlekhId], references: [id])
+  qrlekhId      Int            @unique
+  SubQrlekhData SubQrlekhData? @relation(fields: [subQrlekhId], references: [id])
+  subQrlekhId   Int?           @unique
+
 }
 
 model QrlekhImage {
   id    Int    @id @default(autoincrement())
   image String
 
-  QrlekhData   QrlekhData @relation(fields: [qrlekhDataId], references: [id])
-  qrlekhDataId Int        @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  QrlekhData QrlekhData @relation(fields: [qrlekhId], references: [id])
+  qrlekhId   Int        @unique
+
+  SubQrlekhData SubQrlekhData @relation(fields: [subQrImageId], references: [id])
+  subQrImageId  Int           @unique
 }
 
-model TagName {
-  id      Int          @id @default(autoincrement())
-  tagName String
-  lat     Decimal     @unique
-  long    Decimal     @unique
-  userId  Int?
-  User    User?        @relation(fields: [userId], references: [id])
-  qr      QrlekhData[]
+model QrlekhGallery {
+  id      Int      @id @default(autoincrement())
+  gallery String[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  QrlekhData QrlekhData? @relation(fields: [qrlekhId], references: [id])
+  qrlekhId   Int?        @unique
+
+  SubQrlekhData  SubQrlekhData? @relation(fields: [subQrGalleryId], references: [id])
+  subQrGalleryId Int?           @unique
+}
+
+model QrBookmark {
+  id Int @id @default(autoincrement())
+
+  expire String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User   User? @relation(fields: [userId], references: [id])
+  userId Int?
+
+  qrlekhData QrlekhData? @relation(fields: [qrlekhId], references: [id])
+  qrlekhId   Int?        @unique
+
+  SubQrlekhData SubQrlekhData? @relation(fields: [subQrlekhId], references: [id])
+  subQrlekhId   Int?           @unique
+}
+
+model QrFavourite {
+  id        Int     @id @default(autoincrement())
+  favourite Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  qrlekhData QrlekhData? @relation(fields: [qrlekhId], references: [id])
+  qrlekhId   Int?        @unique
+
+  user          User?          @relation(fields: [userId], references: [id])
+  userId        Int?           @unique
+  SubQrlekhData SubQrlekhData? @relation(fields: [subQrfavId], references: [id])
+  subQrfavId    Int?           @unique
+}
+
+model TagName {
+  id      Int      @id @default(autoincrement())
+  tagName String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  Qrlekh   QrlekhData? @relation(fields: [qrlekhId], references: [id])
+  qrlekhId Int?        @unique
+
+  SubQrlekhData SubQrlekhData? @relation(fields: [subtagId], references: [id])
+  subtagId      Int?           @unique
 }
 
 enum UserRole {
   ADMIN
   USER
+  SUPERADMIN
+  STAFF
   VENDOR
 }
 
 enum OtpType {
   EMAIL_VERIFICATION
   PASSWORD_RESET
+}
+
+model QrReviews {
+  id       Int     @id @default(autoincrement())
+  desc     String
+  israting Boolean @default(false)
+  rating   Int     @default(9)
+
+  User            User?          @relation(fields: [userId], references: [id])
+  userId          Int?
+  qrlekh          QrlekhData?    @relation(fields: [qrlekhId], references: [id])
+  qrlekhId        Int?
+  SubQrlekhData   SubQrlekhData? @relation(fields: [subQrlekhDataId], references: [id])
+  subQrlekhDataId Int?
 }

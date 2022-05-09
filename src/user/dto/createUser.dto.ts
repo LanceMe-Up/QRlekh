@@ -24,6 +24,7 @@ export class CreateUserDto {
   readonly email: string;
 
   @IsString()
+  @IsOptional()
   @ApiProperty({
     example: '9865000000',
     description: 'should be enter phone number',

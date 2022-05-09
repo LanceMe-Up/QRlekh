@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class QrDto {
   @IsString()
@@ -33,14 +33,8 @@ export class QrDto {
   desc: string;
 
   @IsOptional()
-  @IsBoolean()
-  @ApiProperty({ default: false })
-  like: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ApiProperty({ default: false })
-  dislike: boolean;
+  @ApiProperty()
+  like: number[];
 
   @IsNumber()
   categoryId: number;

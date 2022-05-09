@@ -11,7 +11,7 @@ model User {
   id                     Int             @id @default(autoincrement())
   username               String
   email                  String          @unique
-  phone                  String          @unique
+  // phone                  String          @unique
   password               String
   role                   UserRole        @default(USER)
   profileImage           ProfileImage?
@@ -21,7 +21,7 @@ model User {
   otp                    Otp[]
   qrlekhData             QrlekhData[]
   Category               Category[]
-  favourite              QrFavourite?
+  favourite              QrFavourite[]
   qrBookmark             QrBookmark[]
   review                 QrReviews[]
   SubQrlekhData          SubQrlekhData[]
@@ -70,8 +70,7 @@ model QrlekhData {
 
   desc String
 
-  like    Boolean @default(false)
-  dislike Boolean @default(false)
+  like    Int[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -106,8 +105,7 @@ model SubQrlekhData {
 
   desc String
 
-  like    Boolean @default(false)
-  dislike Boolean @default(false)
+  like    Int[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -171,7 +169,7 @@ model QrlekhGallery {
 model QrBookmark {
   id Int @id @default(autoincrement())
 
-  expire String
+  expiryDate DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

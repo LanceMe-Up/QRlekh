@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class SubQrDto {
   @IsString()
@@ -38,14 +38,8 @@ export class SubQrDto {
   // rating: number;
 
   @IsOptional()
-  @IsBoolean()
-  @ApiProperty({ default: false })
-  like: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  @ApiProperty({ default: false })
-  dislike: boolean;
+  @ApiProperty()
+  like: number[];
 
   @IsNumber()
   qrlekhDataId: number;

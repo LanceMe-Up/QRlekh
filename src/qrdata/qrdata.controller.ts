@@ -9,6 +9,7 @@ import {
   UseGuards,
   UploadedFile,
   UseInterceptors,
+  Delete,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
@@ -18,6 +19,8 @@ import { JwtAuthGuard } from '../@guards/jwt.guard';
 import { RolesGuard } from '../@guards/roles.guard';
 import { imageFileFilter, validateFileName } from '../photo-validate';
 import { Roles } from '../roles.decorates';
+import { CreateBookmarkDto } from './dto/bookmark.dto';
+import { CreateQrFavouriteDto } from './dto/favourite.dto';
 import { QrDto } from './dto/qr.dto';
 import { SubQrDto } from './dto/sub.qr.dto';
 // import { SubQrDto } from './dto/sub.qr.dto';
@@ -42,6 +45,16 @@ export class QrdataController {
     return await this.qrService.get();
   }
 
+  @Get('/bookmark')
+  getBookmark() {
+    return this.qrService.getBookmark();
+  }
+
+  @Get('/favourite')
+  getFavourite() {
+    return this.qrService.getFavourite();
+  }
+
   @Post('/sub-module')
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
@@ -62,6 +75,31 @@ export class QrdataController {
   @Get('/:slug/data')
   getSlug(@Param('slug') slug: string) {
     return this.qrService.getBySlug(slug);
+  }
+
+  @Patch('/:id/likes')
+  countLike(@Param('id') id: string, @Request() req: any) {
+    return this.qrService.getLike({ id: Number(id) }, req.user.id);
+  }
+
+  // remove a Like to a Post
+  @Delete(':id/likes')
+  @UseGuards(JwtAuthGuard)
+  removeLike(@Request() req: any, @Param('id') id: string) {
+    return this.qrService.removeLike({ id: Number(id) }, req.user.id);
+  }
+
+  // like a sub child Like to a Post
+  @Patch('/:id/sub-likes')
+  countsubLike(@Param('id') id: string, @Request() req: any) {
+    return this.qrService.getSubLike({ id: Number(id) }, req.user.id);
+  }
+
+  // remove a sub child Like to a Post
+  @Delete(':id/sub-likes')
+  @UseGuards(JwtAuthGuard)
+  removesubLike(@Request() req: any, @Param('id') id: string) {
+    return this.qrService.removeSubLike({ id: Number(id) }, req.user.id);
   }
 
   @Post('/image')
@@ -107,4 +145,52 @@ export class QrdataController {
   // async deleteData(@Param('id') id: number) {
   //   return await this.qrService.deleteData(id);
   // }
+
+  @Post('/bookmark')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
+  createBookmark(@Body() data: CreateBookmarkDto, @Request() req: any) {
+    return this.qrService.createBookmark(
+      data,
+      data.subQrlekhId,
+      data.qrlekhId,
+      req.user.id,
+    );
+  }
+
+  @Patch('/bookmark/:id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
+  updateBookmark(@Param('id') id: string, @Body() data: CreateBookmarkDto) {
+    return this.qrService.updateBookmark(
+      +id,
+      data,
+      data.subQrlekhId,
+      data.qrlekhId,
+    );
+  }
+
+  @Post('/favourite')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
+  createFavourite(@Body() data: CreateQrFavouriteDto, @Request() req: any) {
+    return this.qrService.createFavourite(
+      data,
+      data.subQrfavId,
+      data.qrlekhId,
+      req.user.id,
+    );
+  }
+
+  @Patch('/favourite/:id')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
+  updateFavourite(@Param('id') id: string, @Body() data: CreateQrFavouriteDto) {
+    return this.qrService.updateFavourite(
+      +id,
+      data,
+      data.subQrfavId,
+      data.qrlekhId,
+    );
+  }
 }

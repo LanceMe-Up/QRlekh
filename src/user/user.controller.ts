@@ -11,7 +11,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { diskStorage } from 'multer';
 
 import { JwtAuthGuard } from '../@guards/jwt.guard';
@@ -20,6 +20,7 @@ import { imageFileFilter, validateFileName } from '../photo-validate';
 import { UserService } from './user.service';
 
 @Controller('users')
+@ApiTags('users')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class UsersController {

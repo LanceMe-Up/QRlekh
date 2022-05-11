@@ -7,27 +7,26 @@ import {
   Request,
   Param,
   UseGuards,
-  UploadedFile,
-  UseInterceptors,
   Delete,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
-import { diskStorage } from 'multer';
 import { JwtAuthGuard } from '../@guards/jwt.guard';
 import { RolesGuard } from '../@guards/roles.guard';
-import { imageFileFilter, validateFileName } from '../photo-validate';
 import { Roles } from '../roles.decorates';
-import { CreateBookmarkDto } from './dto/bookmark.dto';
-import { CreateQrFavouriteDto } from './dto/favourite.dto';
+import {
+  CreateQrBookmarkDto,
+  CreateSubQrBookmarkDto,
+} from './dto/bookmark.dto';
+import {
+  CreateQrFavouriteDto,
+  CreateSubQrFavouriteDto,
+} from './dto/favourite.dto';
 import { QrDto } from './dto/qr.dto';
-import { SubQrDto } from './dto/sub.qr.dto';
-// import { SubQrDto } from './dto/sub.qr.dto';
-
 import { QrdataService } from './qrdata.service';
 
 @Controller('qrlekh')
+@ApiTags('qrlekh')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class QrdataController {
@@ -45,28 +44,6 @@ export class QrdataController {
     return await this.qrService.get();
   }
 
-  @Get('/bookmark')
-  getBookmark() {
-    return this.qrService.getBookmark();
-  }
-
-  @Get('/favourite')
-  getFavourite() {
-    return this.qrService.getFavourite();
-  }
-
-  @Post('/sub-module')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
-  createSub(@Body() data: SubQrDto, @Request() req: any) {
-    return this.qrService.createSubQr(data, req.user.id, data.qrlekhDataId);
-  }
-
-  @Get('/sub-module')
-  async getSub() {
-    return await this.qrService.getSubQr();
-  }
-
   @Get('/:id')
   getById(@Param('id') id: string) {
     return this.qrService.getById({ id: Number(id) });
@@ -77,6 +54,16 @@ export class QrdataController {
     return this.qrService.getBySlug(slug);
   }
 
+  @Get('/bookmark')
+  getBookmark() {
+    return this.qrService.getBookmark();
+  }
+
+  @Get('/favourite')
+  getFavourite() {
+    return this.qrService.getFavourite();
+  }
+
   @Patch('/:id/likes')
   countLike(@Param('id') id: string, @Request() req: any) {
     return this.qrService.getLike({ id: Number(id) }, req.user.id);
@@ -84,7 +71,6 @@ export class QrdataController {
 
   // remove a Like to a Post
   @Delete(':id/likes')
-  @UseGuards(JwtAuthGuard)
   removeLike(@Request() req: any, @Param('id') id: string) {
     return this.qrService.removeLike({ id: Number(id) }, req.user.id);
   }
@@ -96,47 +82,10 @@ export class QrdataController {
   }
 
   // remove a sub child Like to a Post
-  @Delete(':id/sub-likes')
+  @Delete('/:id/sub-likes/remove')
   @UseGuards(JwtAuthGuard)
   removesubLike(@Request() req: any, @Param('id') id: string) {
     return this.qrService.removeSubLike({ id: Number(id) }, req.user.id);
-  }
-
-  @Post('/image')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: 'public/upload',
-        filename: validateFileName,
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
-  async createQrImage(
-    @UploadedFile() file: Express.Multer.File,
-    @Body('qrlekhDataId') qrlekhDataId: any,
-  ) {
-    const image = `${process.env.HOST}/static/upload/${file.filename}`;
-    return this.qrService.setQrlekhImage(image, Number(qrlekhDataId), null);
-  }
-
-  @Patch('/update-image/:id')
-  @UseInterceptors(
-    FileInterceptor('image', {
-      storage: diskStorage({
-        destination: 'public/upload',
-        filename: validateFileName,
-      }),
-      fileFilter: imageFileFilter,
-    }),
-  )
-  async update(
-    @UploadedFile() file: Express.Multer.File,
-    @Request() req: any,
-    @Param('id') id: number,
-  ) {
-    const image = `${process.env.HOST}/static/upload/${file.filename}`;
-    return await this.qrService.updateQrlekhImage(image, +id);
   }
 
   // @Delete(':id')
@@ -146,51 +95,51 @@ export class QrdataController {
   //   return await this.qrService.deleteData(id);
   // }
 
-  @Post('/bookmark')
+  @Post('/bookmark/qr-lekh')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
-  createBookmark(@Body() data: CreateBookmarkDto, @Request() req: any) {
-    return this.qrService.createBookmark(
-      data,
-      data.subQrlekhId,
-      data.qrlekhId,
-      req.user.id,
-    );
+  createQrBookmark(@Body() data: CreateQrBookmarkDto, @Request() req: any) {
+    return this.qrService.createQrBookmark(data, data.qrlekhId, req.user.id);
   }
 
-  @Patch('/bookmark/:id')
+  @Post('/bookmark/sub-qr-lekh')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
-  updateBookmark(@Param('id') id: string, @Body() data: CreateBookmarkDto) {
-    return this.qrService.updateBookmark(
-      +id,
-      data,
-      data.subQrlekhId,
-      data.qrlekhId,
-    );
+  createSubQrBookmark(
+    @Body() data: CreateSubQrBookmarkDto,
+    @Request() req: any,
+  ) {
+    return this.qrService.createQrBookmark(data, data.subQrlekhId, req.user.id);
+  }
+
+  @Patch('/bookmark/:id/qr-lekh')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
+  updateQrBookmark(@Param('id') id: string, @Body() data: CreateQrBookmarkDto) {
+    return this.qrService.updateQrBookmark(+id, data, data.qrlekhId);
   }
 
   @Post('/favourite')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
-  createFavourite(@Body() data: CreateQrFavouriteDto, @Request() req: any) {
-    return this.qrService.createFavourite(
-      data,
-      data.subQrfavId,
-      data.qrlekhId,
-      req.user.id,
-    );
+  createQrFavourite(@Body() data: CreateQrFavouriteDto, @Request() req: any) {
+    return this.qrService.createQrFavourite(data, data.qrlekhId, req.user.id);
+  }
+
+  @Post('/favourite/sub-module')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
+  createSubQrFavourite(
+    @Body() data: CreateSubQrFavouriteDto,
+    @Request() req: any,
+  ) {
+    return this.qrService.createQrFavourite(data, data.subQrfavId, req.user.id);
   }
 
   @Patch('/favourite/:id')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
   updateFavourite(@Param('id') id: string, @Body() data: CreateQrFavouriteDto) {
-    return this.qrService.updateFavourite(
-      +id,
-      data,
-      data.subQrfavId,
-      data.qrlekhId,
-    );
+    return this.qrService.updateQrFavourite(+id, data, data.qrlekhId);
   }
 }

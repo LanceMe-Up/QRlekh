@@ -6,6 +6,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
 import { JwtAuthGuard } from '../@guards/jwt.guard';
 import { RolesGuard } from '../@guards/roles.guard';
@@ -13,6 +14,8 @@ import { Roles } from '../roles.decorates';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create.category.dto';
 
+@ApiTags('category')
+@ApiBearerAuth()
 @Controller('category')
 export class CategoryController {
   constructor(private readonly category: CategoryService) {}

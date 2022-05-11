@@ -13,13 +13,25 @@ export class TagService {
     return { count: data.length, data };
   }
 
-  async createTag(tag: Prisma.TagNameCreateInput, subQr?: any, qr?: any) {
+  async createQrTag(tag: Prisma.TagNameCreateInput, qrlekhId: number) {
     try {
       return this.prismaService.tagName.create({
         data: {
           tagName: tag.tagName,
-          subtagId: subQr,
-          qrlekhId: qr,
+          qrlekhId,
+        },
+      });
+    } catch (e) {
+      return { log: e.message };
+    }
+  }
+
+  async createSubQrTag(tag: Prisma.TagNameCreateInput, subtagId: number) {
+    try {
+      return this.prismaService.tagName.create({
+        data: {
+          tagName: tag.tagName,
+          subtagId,
         },
       });
     } catch (e) {

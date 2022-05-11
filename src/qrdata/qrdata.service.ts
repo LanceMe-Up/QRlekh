@@ -81,6 +81,11 @@ export class QrdataService {
         qrBookmark: true,
         favourite: true,
         subQrlekh: true,
+        type: {
+          select: {
+            type: true,
+          },
+        },
       },
     });
 
@@ -133,6 +138,11 @@ export class QrdataService {
           qrBookmark: true,
           favourite: true,
           subQrlekh: true,
+          type: {
+            select: {
+              type: true,
+            },
+          },
         },
       });
       return data;
@@ -187,6 +197,11 @@ export class QrdataService {
           qrBookmark: true,
           favourite: true,
           subQrlekh: true,
+          type: {
+            select: {
+              type: true,
+            },
+          },
         },
       });
       return data;
@@ -221,24 +236,28 @@ export class QrdataService {
 
   // remove a like from a qrlekh data
   async removeLike(postId: Prisma.QrlekhDataWhereUniqueInput, userId: any) {
-    const post = await this.checkPostId(postId.id);
-    const alreadyLiked = post.like.includes(userId);
-    if (!alreadyLiked) {
-      throw new HttpException(
-        'You already removed your like from this post',
-        HttpStatus.CONFLICT,
-      );
+    try {
+      const post = await this.checkPostId(postId.id);
+      const alreadyLiked = post.like.includes(userId);
+      if (!alreadyLiked) {
+        throw new HttpException(
+          'You already removed your like from this post',
+          HttpStatus.CONFLICT,
+        );
+      }
+      const newLikes = post.like.filter((x) => x !== userId);
+      await this.prismaService.qrlekhData.update({
+        where: {
+          id: postId.id,
+        },
+        data: {
+          like: newLikes,
+        },
+      });
+      return { message: 'Removed like successfully' };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
     }
-    const newLikes = post.like.filter((x) => x !== userId);
-    await this.prismaService.qrlekhData.update({
-      where: {
-        id: postId.id,
-      },
-      data: {
-        like: newLikes,
-      },
-    });
-    return { message: 'Removed like successfully' };
   }
 
   // add a like from a qrlekh data
@@ -270,24 +289,28 @@ export class QrdataService {
     postId: Prisma.SubQrlekhDataWhereUniqueInput,
     userId: any,
   ) {
-    const post = await this.checkPostId(postId.id);
-    const alreadyLiked = post.like.includes(userId);
-    if (!alreadyLiked) {
-      throw new HttpException(
-        'You already removed your like from this post',
-        HttpStatus.CONFLICT,
-      );
+    try {
+      const post = await this.checkPostId(postId.id);
+      const alreadyLiked = post.like.includes(userId);
+      if (!alreadyLiked) {
+        throw new HttpException(
+          'You already removed your like from this post',
+          HttpStatus.CONFLICT,
+        );
+      }
+      const newLikes = post.like.filter((x) => x !== userId);
+      await this.prismaService.subQrlekhData.update({
+        where: {
+          id: postId.id,
+        },
+        data: {
+          like: newLikes,
+        },
+      });
+      return { message: 'Removed like successfully' };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
     }
-    const newLikes = post.like.filter((x) => x !== userId);
-    await this.prismaService.subQrlekhData.update({
-      where: {
-        id: postId.id,
-      },
-      data: {
-        like: newLikes,
-      },
-    });
-    return { message: 'Removed like successfully' };
   }
 
   async checkPostId(id: number) {
@@ -311,23 +334,27 @@ export class QrdataService {
   }
 
   async checkSubPostId(id: number) {
-    const post = await this.prismaService.subQrlekhData.findUnique({
-      where: {
-        id,
-      },
-      include: {
-        User: {
-          select: {
-            id: true,
-            username: true,
+    try {
+      const post = await this.prismaService.subQrlekhData.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          User: {
+            select: {
+              id: true,
+              username: true,
+            },
           },
         },
-      },
-    });
-    if (!post) {
-      throw new BadRequestException({ message: `not found ${id}` });
+      });
+      if (!post) {
+        throw new BadRequestException({ message: `not found ${id}` });
+      }
+      return post;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
     }
-    return post;
   }
 
   // async deleteData(id: number) {
@@ -338,115 +365,7 @@ export class QrdataService {
   //   return { success: true, data: `Delete with id ${id}` };
   // }
 
-  async setQrlekhImage(image: any, qrlekhId: any, subQrImageId: any) {
-    try {
-      const profile = this.prismaService.qrlekhImage.create({
-        data: {
-          image,
-          qrlekhId,
-          subQrImageId,
-        },
-      });
-      return profile;
-    } catch (e) {
-      throw new BadRequestException({ message: e.message });
-    }
-  }
-
-  async updateQrlekhImage(image: any, id: number) {
-    try {
-      const profile = this.prismaService.qrlekhImage.update({
-        where: {
-          id,
-        },
-        data: {
-          image,
-        },
-      });
-      return profile;
-    } catch (e) {
-      throw new BadRequestException({ message: e.message });
-    }
-  }
-
   // start sub-child
-  async createSubQr(
-    createQr: Prisma.SubQrlekhDataCreateInput,
-    userId: any,
-    qrlekhDataId: any,
-  ) {
-    try {
-      const slug: string = this.slugifyService.toSlug(createQr.title);
-      return await this.prismaService.subQrlekhData.create({
-        data: {
-          knownFor: createQr.knownFor,
-          title: createQr.title,
-          slug,
-          location: createQr.location,
-          desc: createQr.desc,
-          like: createQr.like,
-          userId,
-          qrlekhDataId,
-        },
-      });
-    } catch (e) {
-      throw new BadRequestException({ message: e.message });
-    }
-  }
-
-  async getSubQr() {
-    const data = await this.prismaService.subQrlekhData.findMany({
-      include: {
-        User: {
-          select: {
-            username: true,
-            email: true,
-            id: true,
-          },
-        },
-        image: {
-          select: {
-            image: true,
-          },
-        },
-        gallery: {
-          select: {
-            gallery: true,
-          },
-        },
-        qrReviews: {
-          select: {
-            rating: true,
-            israting: true,
-            desc: true,
-            User: {
-              select: {
-                username: true,
-                email: true,
-                id: true,
-              },
-            },
-          },
-        },
-        tag: {
-          select: {
-            tagName: true,
-          },
-        },
-        qrBookmark: true,
-        favourite: true,
-        QrlekhData: {
-          select: {
-            id: true,
-            title: true,
-          },
-        },
-      },
-    });
-
-    return { count: data.length, data };
-  }
-
   async getBookmark() {
     try {
       const data = await this.prismaService.qrBookmark.findMany({});
@@ -457,9 +376,8 @@ export class QrdataService {
     }
   }
 
-  async createBookmark(
+  async createQrBookmark(
     dataBookmark: Prisma.QrBookmarkCreateInput,
-    subQrlekhId: number,
     qrlekhId: number,
     userId: number,
   ) {
@@ -467,7 +385,6 @@ export class QrdataService {
       const data = await this.prismaService.qrBookmark.create({
         data: {
           expiryDate: dataBookmark.expiryDate,
-          subQrlekhId,
           qrlekhId,
           userId,
         },
@@ -478,10 +395,28 @@ export class QrdataService {
     }
   }
 
-  async updateBookmark(
+  async createSubQrBookmark(
+    dataBookmark: Prisma.QrBookmarkCreateInput,
+    subQrlekhId: number,
+    userId: number,
+  ) {
+    try {
+      const data = await this.prismaService.qrBookmark.create({
+        data: {
+          expiryDate: dataBookmark.expiryDate,
+          subQrlekhId,
+          userId,
+        },
+      });
+      return { data };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async updateQrBookmark(
     id: number,
     dataBookmark: Prisma.QrBookmarkUpdateInput,
-    subQrlekhId: number,
     qrlekhId: number,
   ) {
     try {
@@ -491,7 +426,6 @@ export class QrdataService {
         },
         data: {
           expiryDate: dataBookmark.expiryDate,
-          subQrlekhId,
           qrlekhId,
         },
       });
@@ -510,9 +444,8 @@ export class QrdataService {
     }
   }
 
-  async createFavourite(
+  async createQrFavourite(
     dataFav: Prisma.QrFavouriteCreateInput,
-    subQrfavId: number,
     qrlekhId: number,
     userId: number,
   ) {
@@ -520,7 +453,6 @@ export class QrdataService {
       const data = await this.prismaService.qrFavourite.create({
         data: {
           favourite: dataFav.favourite,
-          subQrfavId,
           qrlekhId,
           userId,
         },
@@ -531,10 +463,28 @@ export class QrdataService {
     }
   }
 
-  async updateFavourite(
+  async createSubQrFavourite(
+    dataFav: Prisma.QrFavouriteCreateInput,
+    subQrfavId: number,
+    userId: number,
+  ) {
+    try {
+      const data = await this.prismaService.qrFavourite.create({
+        data: {
+          favourite: dataFav.favourite,
+          subQrfavId,
+          userId,
+        },
+      });
+      return { data };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async updateQrFavourite(
     id: number,
     dataFav: Prisma.QrFavouriteUpdateInput,
-    subQrfavId: number,
     qrlekhId: number,
   ) {
     try {
@@ -544,7 +494,6 @@ export class QrdataService {
         },
         data: {
           favourite: dataFav.favourite,
-          subQrfavId,
           qrlekhId,
         },
       });

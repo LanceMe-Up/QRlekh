@@ -99,7 +99,7 @@ model SubQrlekhData {
   knownFor String
   title    String       @unique
   slug     String
-  image    QrlekhImage?
+  image    SubQrlekhImage?
   location String
   type     QrType?
 
@@ -110,7 +110,7 @@ model SubQrlekhData {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  gallery   QrlekhGallery?
+  gallery   SubQrlekhGallery?
   favourite QrFavourite?
 
   User   User? @relation(fields: [userId], references: [id])
@@ -131,8 +131,8 @@ model QrType {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  qrlekh        QrlekhData     @relation(fields: [qrlekhId], references: [id])
-  qrlekhId      Int            @unique
+  qrlekh        QrlekhData?     @relation(fields: [qrlekhId], references: [id])
+  qrlekhId      Int?            @unique
   SubQrlekhData SubQrlekhData? @relation(fields: [subQrlekhId], references: [id])
   subQrlekhId   Int?           @unique
 
@@ -147,9 +147,6 @@ model QrlekhImage {
 
   QrlekhData QrlekhData @relation(fields: [qrlekhId], references: [id])
   qrlekhId   Int        @unique
-
-  SubQrlekhData SubQrlekhData @relation(fields: [subQrImageId], references: [id])
-  subQrImageId  Int           @unique
 }
 
 model QrlekhGallery {
@@ -159,11 +156,30 @@ model QrlekhGallery {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  QrlekhData QrlekhData? @relation(fields: [qrlekhId], references: [id])
-  qrlekhId   Int?        @unique
+  QrlekhData QrlekhData @relation(fields: [qrlekhId], references: [id])
+  qrlekhId   Int       @unique
+}
 
-  SubQrlekhData  SubQrlekhData? @relation(fields: [subQrGalleryId], references: [id])
-  subQrGalleryId Int?           @unique
+model SubQrlekhImage {
+  id    Int    @id @default(autoincrement())
+  image String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  SubQrlekhData SubQrlekhData @relation(fields: [subQrImageId], references: [id])
+  subQrImageId  Int           @unique
+}
+
+model SubQrlekhGallery {
+  id      Int      @id @default(autoincrement())
+  gallery String[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  SubQrlekhData SubQrlekhData @relation(fields: [subQrImageId], references: [id])
+  subQrImageId  Int           @unique
 }
 
 model QrBookmark {

@@ -13,25 +13,33 @@ import { UserRole } from '@prisma/client';
 import { JwtAuthGuard } from '../@guards/jwt.guard';
 import { RolesGuard } from '../@guards/roles.guard';
 import { Roles } from '../roles.decorates';
-import { TagDto } from './dto/tag.dto';
+import { TagQrDto, TagSubQrDto } from './dto/tag.dto';
 import { UpdateTagDto } from './dto/update.tag.dto';
 import { TagService } from './tag.service';
 
 @ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('tag')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @Post()
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  async create(@Body() dto: TagDto) {
-    return this.tagService.createTag(dto, dto.subtagId, dto.qrlekhId);
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  async createQr(@Body() dto: TagQrDto) {
+    return this.tagService.createQrTag(dto, dto.qrlekhId);
+  }
+
+  @Post()
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  async createSubQr(@Body() dto: TagSubQrDto) {
+    return this.tagService.createQrTag(dto, dto.subtagId);
   }
 
   @Patch(':id')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
   async update(@Body() dto: UpdateTagDto, @Param('id') id: string) {
     return this.tagService.updateTag(
       dto,
@@ -42,7 +50,6 @@ export class TagController {
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
   async getAll() {
     const data = await this.tagService.getTag();
 

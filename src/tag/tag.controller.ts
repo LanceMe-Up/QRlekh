@@ -8,6 +8,7 @@ import {
   Patch,
   Param,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { ApiBearerAuth } from '@nestjs/swagger/dist/decorators/api-bearer.decorator';
 import { UserRole } from '@prisma/client';
 import { JwtAuthGuard } from '../@guards/jwt.guard';
@@ -19,6 +20,7 @@ import { TagService } from './tag.service';
 
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
+@ApiTags('tag')
 @Controller('tag')
 export class TagController {
   constructor(private readonly tagService: TagService) {}

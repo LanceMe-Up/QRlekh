@@ -213,7 +213,7 @@ model QrFavourite {
   qrlekhId   Int?        @unique
 
   user          User?          @relation(fields: [userId], references: [id])
-  userId        Int?           @unique
+  userId        Int? 
   SubQrlekhData SubQrlekhData? @relation(fields: [subQrfavId], references: [id])
   subQrfavId    Int?           @unique
 }

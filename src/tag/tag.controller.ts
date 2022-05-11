@@ -23,23 +23,33 @@ import { TagService } from './tag.service';
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 
-  @Post()
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Get()
+  async getAll() {
+    const data = await this.tagService.getTag();
+
+    if (!data) throw new NotFoundException("Tag doesn't exists!");
+    return data;
+  }
+
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Post('/qr')
   async createQr(@Body() dto: TagQrDto) {
     return this.tagService.createQrTag(dto, dto.qrlekhId);
   }
 
-  @Post()
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Post('/sub/qr')
   async createSubQr(@Body() dto: TagSubQrDto) {
     return this.tagService.createQrTag(dto, dto.subtagId);
   }
 
-  @Patch(':id')
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Patch(':id')
   async update(@Body() dto: UpdateTagDto, @Param('id') id: string) {
     return this.tagService.updateTag(
       dto,
@@ -47,14 +57,6 @@ export class TagController {
       dto.subtagId,
       dto.qrlekhId,
     );
-  }
-
-  @Get()
-  async getAll() {
-    const data = await this.tagService.getTag();
-
-    if (!data) throw new NotFoundException("Tag doesn't exists!");
-    return data;
   }
 
   //   @UseGuards(JwtAuthGuard)

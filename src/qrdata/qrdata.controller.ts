@@ -14,14 +14,6 @@ import { UserRole } from '@prisma/client';
 import { JwtAuthGuard } from '../@guards/jwt.guard';
 import { RolesGuard } from '../@guards/roles.guard';
 import { Roles } from '../roles.decorates';
-import {
-  CreateQrBookmarkDto,
-  CreateSubQrBookmarkDto,
-} from './dto/bookmark.dto';
-import {
-  CreateQrFavouriteDto,
-  CreateSubQrFavouriteDto,
-} from './dto/favourite.dto';
 import { QrDto } from './dto/qr.dto';
 import { QrdataService } from './qrdata.service';
 
@@ -34,7 +26,7 @@ export class QrdataController {
 
   @Post()
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   create(@Body() data: QrDto, @Request() req: any) {
     return this.qrService.createQr(data, req.user.id, data.categoryId);
   }
@@ -52,16 +44,6 @@ export class QrdataController {
   @Get('/:slug/data')
   getSlug(@Param('slug') slug: string) {
     return this.qrService.getBySlug(slug);
-  }
-
-  @Get('/bookmark')
-  getBookmark() {
-    return this.qrService.getBookmark();
-  }
-
-  @Get('/favourite')
-  getFavourite() {
-    return this.qrService.getFavourite();
   }
 
   @Patch('/:id/likes')
@@ -94,52 +76,4 @@ export class QrdataController {
   // async deleteData(@Param('id') id: number) {
   //   return await this.qrService.deleteData(id);
   // }
-
-  @Post('/bookmark/qr-lekh')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
-  createQrBookmark(@Body() data: CreateQrBookmarkDto, @Request() req: any) {
-    return this.qrService.createQrBookmark(data, data.qrlekhId, req.user.id);
-  }
-
-  @Post('/bookmark/sub-qr-lekh')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
-  createSubQrBookmark(
-    @Body() data: CreateSubQrBookmarkDto,
-    @Request() req: any,
-  ) {
-    return this.qrService.createQrBookmark(data, data.subQrlekhId, req.user.id);
-  }
-
-  @Patch('/bookmark/:id/qr-lekh')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
-  updateQrBookmark(@Param('id') id: string, @Body() data: CreateQrBookmarkDto) {
-    return this.qrService.updateQrBookmark(+id, data, data.qrlekhId);
-  }
-
-  @Post('/favourite')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
-  createQrFavourite(@Body() data: CreateQrFavouriteDto, @Request() req: any) {
-    return this.qrService.createQrFavourite(data, data.qrlekhId, req.user.id);
-  }
-
-  @Post('/favourite/sub-module')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
-  createSubQrFavourite(
-    @Body() data: CreateSubQrFavouriteDto,
-    @Request() req: any,
-  ) {
-    return this.qrService.createQrFavourite(data, data.subQrfavId, req.user.id);
-  }
-
-  @Patch('/favourite/:id')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.USER || UserRole.ADMIN || UserRole.SUPERADMIN)
-  updateFavourite(@Param('id') id: string, @Body() data: CreateQrFavouriteDto) {
-    return this.qrService.updateQrFavourite(+id, data, data.qrlekhId);
-  }
 }

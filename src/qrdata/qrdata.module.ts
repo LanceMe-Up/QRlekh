@@ -1,6 +1,8 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
 import { SlugifyService } from '../slugify.service';
+import { QrBookmarkModule } from './qr.bookmark/qr.bookmark.module';
+import { QrFavouriteModule } from './qr.favourite/qr.favourite.module';
 import { QrImageModule } from './qr.image/qr.image.module';
 import { QrReviewModule } from './qr.reviews/qr.reviews.module';
 import { QrdataController } from './qrdata.controller';
@@ -16,6 +18,8 @@ import { SubQrModule } from './sub.qr/sub.qr.module';
     SubQrImageModule,
     SubQrModule,
     QrReviewModule,
+    QrBookmarkModule,
+    QrFavouriteModule,
   ],
   controllers: [QrdataController],
   providers: [QrdataService, PrismaService, SlugifyService],

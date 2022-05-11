@@ -15,14 +15,14 @@ export class ListTourController {
   constructor(private qrtypeService: QrTypeService) {}
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN || UserRole.VENDOR)
-  @Post('qrlekh')
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
+  @Post()
   async create(@Body() data: CreateQrTypeDto) {
     return await this.qrtypeService.createQrType(data, +data.qrlekhId);
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN || UserRole.VENDOR)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post('sub-qrlekh')
   async createSub(@Body() data: CreateSubQrTypeDto) {
     return await this.qrtypeService.createSubQrType(data, +data.subQrlekhId);

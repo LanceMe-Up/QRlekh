@@ -15,7 +15,7 @@ export class TagService {
 
   async createQrTag(tag: Prisma.TagNameCreateInput, qrlekhId: number) {
     try {
-      return this.prismaService.tagName.create({
+      return await this.prismaService.tagName.create({
         data: {
           tagName: tag.tagName,
           qrlekhId,
@@ -28,7 +28,7 @@ export class TagService {
 
   async createSubQrTag(tag: Prisma.TagNameCreateInput, subtagId: number) {
     try {
-      return this.prismaService.tagName.create({
+      return await this.prismaService.tagName.create({
         data: {
           tagName: tag.tagName,
           subtagId,

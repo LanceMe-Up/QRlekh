@@ -28,6 +28,7 @@ export class QrdataService {
           title: createQr.title,
           slug,
           location: createQr.location,
+          visitor: createQr.visitor,
           desc: createQr.desc,
           like: createQr.like,
           userId,
@@ -153,7 +154,20 @@ export class QrdataService {
 
   async getBySlug(slug: string) {
     try {
-      const data = this.prismaService.qrlekhData.findMany({
+      // for visitors
+      await this.prismaService.qrlekhData.updateMany({
+        where: {
+          slug: slug,
+        },
+        data: {
+          visitor: {
+            increment: 1,
+          },
+        },
+      });
+
+      // for slug
+      const data = await this.prismaService.qrlekhData.findMany({
         where: {
           slug,
         },
@@ -204,6 +218,7 @@ export class QrdataService {
           },
         },
       });
+
       return data;
     } catch (e) {
       throw new BadRequestException({ message: e.message });

@@ -22,6 +22,7 @@ export class SubQrService {
           knownFor: createQr.knownFor,
           title: createQr.title,
           slug,
+          visitor: createQr.visitor,
           location: createQr.location,
           desc: createQr.desc,
           like: createQr.like,
@@ -152,7 +153,19 @@ export class SubQrService {
 
   async getBySubQrSlug(slug: string) {
     try {
-      const data = this.prismaService.subQrlekhData.findMany({
+      // for visitors
+      await this.prismaService.subQrlekhData.updateMany({
+        where: {
+          slug: slug,
+        },
+        data: {
+          visitor: {
+            increment: 1,
+          },
+        },
+      });
+
+      const data = await this.prismaService.subQrlekhData.findMany({
         where: {
           slug,
         },

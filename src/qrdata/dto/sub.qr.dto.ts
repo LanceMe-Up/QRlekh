@@ -18,6 +18,11 @@ export class SubQrDto {
   })
   slug: string;
 
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty()
+  visitor: number;
+
   @IsString()
   @ApiProperty({
     example: 'kathamandu',

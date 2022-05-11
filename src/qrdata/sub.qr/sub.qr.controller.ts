@@ -23,12 +23,12 @@ export class SubQrController {
   constructor(private readonly qrService: SubQrService) {}
 
   @Get('/:id')
-  getByQrlekhId(@Param('id') id: string) {
+  getBySubQrlekhId(@Param('id') id: string) {
     return this.qrService.getBySubQrId({ id: Number(id) });
   }
 
   @Get('/:slug/data')
-  getQrlekhSlug(@Param('slug') slug: string) {
+  getSubQrlekhSlug(@Param('slug') slug: string) {
     return this.qrService.getBySubQrSlug(slug);
   }
 

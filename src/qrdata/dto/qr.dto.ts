@@ -18,6 +18,11 @@ export class QrDto {
   })
   slug: string;
 
+  @IsNumber()
+  @IsOptional()
+  @ApiProperty()
+  visitor: number;
+
   @IsString()
   @ApiProperty({
     example: 'kathamandu',

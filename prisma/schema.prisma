@@ -64,13 +64,14 @@ model QrlekhData {
   knownFor String
   title    String       @unique
   slug     String
+  visitor  Int          @default(0)
   image    QrlekhImage?
   location String
   type     QrType?
 
   desc String
 
-  like    Int[]
+  like Int[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -95,17 +96,18 @@ model QrlekhData {
 
 // child
 model SubQrlekhData {
-  id       Int          @id @default(autoincrement())
+  id       Int             @id @default(autoincrement())
   knownFor String
-  title    String       @unique
+  title    String          @unique
   slug     String
+  visitor  Int             @default(0)
   image    SubQrlekhImage?
   location String
   type     QrType?
 
   desc String
 
-  like    Int[]
+  like Int[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -131,8 +133,8 @@ model QrType {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  qrlekh        QrlekhData?     @relation(fields: [qrlekhId], references: [id])
-  qrlekhId      Int?            @unique
+  qrlekh        QrlekhData?    @relation(fields: [qrlekhId], references: [id])
+  qrlekhId      Int?           @unique
   SubQrlekhData SubQrlekhData? @relation(fields: [subQrlekhId], references: [id])
   subQrlekhId   Int?           @unique
 
@@ -157,7 +159,7 @@ model QrlekhGallery {
   updatedAt DateTime @updatedAt
 
   QrlekhData QrlekhData @relation(fields: [qrlekhId], references: [id])
-  qrlekhId   Int       @unique
+  qrlekhId   Int        @unique
 }
 
 model SubQrlekhImage {
@@ -247,7 +249,7 @@ model QrReviews {
   id       Int     @id @default(autoincrement())
   desc     String
   israting Boolean @default(false)
-  rating   Int     @default(9)
+  rating   Int     @default(4)
 
   User            User?          @relation(fields: [userId], references: [id])
   userId          Int?

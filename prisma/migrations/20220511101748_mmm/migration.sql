@@ -9,7 +9,6 @@ CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "username" TEXT NOT NULL,
     "email" TEXT NOT NULL,
-    "phone" TEXT NOT NULL,
     "password" TEXT NOT NULL,
     "role" "UserRole" NOT NULL DEFAULT E'USER',
     "verified" BOOLEAN NOT NULL DEFAULT false,
@@ -57,11 +56,10 @@ CREATE TABLE "QrlekhData" (
     "knownFor" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
+    "visitor" INTEGER NOT NULL DEFAULT 0,
     "location" TEXT NOT NULL,
-    "rating" INTEGER NOT NULL DEFAULT 4,
     "desc" TEXT NOT NULL,
-    "like" BOOLEAN NOT NULL DEFAULT false,
-    "dislike" BOOLEAN NOT NULL DEFAULT false,
+    "like" INTEGER[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER,
@@ -76,15 +74,14 @@ CREATE TABLE "SubQrlekhData" (
     "knownFor" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
+    "visitor" INTEGER NOT NULL DEFAULT 0,
     "location" TEXT NOT NULL,
-    "rating" INTEGER NOT NULL DEFAULT 4,
     "desc" TEXT NOT NULL,
-    "like" BOOLEAN NOT NULL DEFAULT false,
-    "dislike" BOOLEAN NOT NULL DEFAULT false,
+    "like" INTEGER[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER,
-    "qrlekhDataId" INTEGER NOT NULL,
+    "qrlekhDataId" INTEGER,
 
     CONSTRAINT "SubQrlekhData_pkey" PRIMARY KEY ("id")
 );
@@ -95,7 +92,7 @@ CREATE TABLE "QrType" (
     "type" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "qrlekhId" INTEGER NOT NULL,
+    "qrlekhId" INTEGER,
     "subQrlekhId" INTEGER,
 
     CONSTRAINT "QrType_pkey" PRIMARY KEY ("id")
@@ -107,8 +104,7 @@ CREATE TABLE "QrlekhImage" (
     "image" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "qrlekhDataId" INTEGER NOT NULL,
-    "qrlekhImageId" INTEGER NOT NULL,
+    "qrlekhId" INTEGER NOT NULL,
 
     CONSTRAINT "QrlekhImage_pkey" PRIMARY KEY ("id")
 );
@@ -119,16 +115,37 @@ CREATE TABLE "QrlekhGallery" (
     "gallery" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "qrlekhDataId" INTEGER,
-    "qrlekhGalleryId" INTEGER,
+    "qrlekhId" INTEGER NOT NULL,
 
     CONSTRAINT "QrlekhGallery_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
+CREATE TABLE "SubQrlekhImage" (
+    "id" SERIAL NOT NULL,
+    "image" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "subQrImageId" INTEGER NOT NULL,
+
+    CONSTRAINT "SubQrlekhImage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "SubQrlekhGallery" (
+    "id" SERIAL NOT NULL,
+    "gallery" TEXT[],
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+    "subQrImageId" INTEGER NOT NULL,
+
+    CONSTRAINT "SubQrlekhGallery_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "QrBookmark" (
     "id" SERIAL NOT NULL,
-    "expire" TEXT NOT NULL,
+    "expiryDate" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER,
@@ -157,7 +174,7 @@ CREATE TABLE "TagName" (
     "tagName" TEXT[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
-    "qrlekhId" INTEGER NOT NULL,
+    "qrlekhId" INTEGER,
     "subtagId" INTEGER,
 
     CONSTRAINT "TagName_pkey" PRIMARY KEY ("id")
@@ -168,7 +185,7 @@ CREATE TABLE "QrReviews" (
     "id" SERIAL NOT NULL,
     "desc" TEXT NOT NULL,
     "israting" BOOLEAN NOT NULL DEFAULT false,
-    "rating" INTEGER NOT NULL DEFAULT 9,
+    "rating" INTEGER NOT NULL DEFAULT 4,
     "userId" INTEGER,
     "qrlekhId" INTEGER,
     "subQrlekhDataId" INTEGER,
@@ -178,9 +195,6 @@ CREATE TABLE "QrReviews" (
 
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
-
--- CreateIndex
-CREATE UNIQUE INDEX "User_phone_key" ON "User"("phone");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "ProfileImage_userId_key" ON "ProfileImage"("userId");
@@ -198,16 +212,16 @@ CREATE UNIQUE INDEX "QrType_qrlekhId_key" ON "QrType"("qrlekhId");
 CREATE UNIQUE INDEX "QrType_subQrlekhId_key" ON "QrType"("subQrlekhId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "QrlekhImage_qrlekhDataId_key" ON "QrlekhImage"("qrlekhDataId");
+CREATE UNIQUE INDEX "QrlekhImage_qrlekhId_key" ON "QrlekhImage"("qrlekhId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "QrlekhImage_qrlekhImageId_key" ON "QrlekhImage"("qrlekhImageId");
+CREATE UNIQUE INDEX "QrlekhGallery_qrlekhId_key" ON "QrlekhGallery"("qrlekhId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "QrlekhGallery_qrlekhDataId_key" ON "QrlekhGallery"("qrlekhDataId");
+CREATE UNIQUE INDEX "SubQrlekhImage_subQrImageId_key" ON "SubQrlekhImage"("subQrImageId");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "QrlekhGallery_qrlekhGalleryId_key" ON "QrlekhGallery"("qrlekhGalleryId");
+CREATE UNIQUE INDEX "SubQrlekhGallery_subQrImageId_key" ON "SubQrlekhGallery"("subQrImageId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "QrBookmark_qrlekhId_key" ON "QrBookmark"("qrlekhId");
@@ -249,25 +263,25 @@ ALTER TABLE "QrlekhData" ADD CONSTRAINT "QrlekhData_categoryId_fkey" FOREIGN KEY
 ALTER TABLE "SubQrlekhData" ADD CONSTRAINT "SubQrlekhData_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "SubQrlekhData" ADD CONSTRAINT "SubQrlekhData_qrlekhDataId_fkey" FOREIGN KEY ("qrlekhDataId") REFERENCES "QrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SubQrlekhData" ADD CONSTRAINT "SubQrlekhData_qrlekhDataId_fkey" FOREIGN KEY ("qrlekhDataId") REFERENCES "QrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QrType" ADD CONSTRAINT "QrType_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "QrType" ADD CONSTRAINT "QrType_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "QrType" ADD CONSTRAINT "QrType_subQrlekhId_fkey" FOREIGN KEY ("subQrlekhId") REFERENCES "SubQrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QrlekhImage" ADD CONSTRAINT "QrlekhImage_qrlekhDataId_fkey" FOREIGN KEY ("qrlekhDataId") REFERENCES "QrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "QrlekhImage" ADD CONSTRAINT "QrlekhImage_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QrlekhImage" ADD CONSTRAINT "QrlekhImage_qrlekhImageId_fkey" FOREIGN KEY ("qrlekhImageId") REFERENCES "SubQrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "QrlekhGallery" ADD CONSTRAINT "QrlekhGallery_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QrlekhGallery" ADD CONSTRAINT "QrlekhGallery_qrlekhDataId_fkey" FOREIGN KEY ("qrlekhDataId") REFERENCES "QrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "SubQrlekhImage" ADD CONSTRAINT "SubQrlekhImage_subQrImageId_fkey" FOREIGN KEY ("subQrImageId") REFERENCES "SubQrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "QrlekhGallery" ADD CONSTRAINT "QrlekhGallery_qrlekhGalleryId_fkey" FOREIGN KEY ("qrlekhGalleryId") REFERENCES "SubQrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "SubQrlekhGallery" ADD CONSTRAINT "SubQrlekhGallery_subQrImageId_fkey" FOREIGN KEY ("subQrImageId") REFERENCES "SubQrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "QrBookmark" ADD CONSTRAINT "QrBookmark_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
@@ -288,7 +302,7 @@ ALTER TABLE "QrFavourite" ADD CONSTRAINT "QrFavourite_qrlekhId_fkey" FOREIGN KEY
 ALTER TABLE "QrFavourite" ADD CONSTRAINT "QrFavourite_subQrfavId_fkey" FOREIGN KEY ("subQrfavId") REFERENCES "SubQrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "TagName" ADD CONSTRAINT "TagName_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "TagName" ADD CONSTRAINT "TagName_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "TagName" ADD CONSTRAINT "TagName_subtagId_fkey" FOREIGN KEY ("subtagId") REFERENCES "SubQrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;

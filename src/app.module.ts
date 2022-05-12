@@ -6,9 +6,10 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { OtpModule } from './otp/otp.module';
 import { QrdataModule } from './qrdata/qrdata.module';
-import { TagModule } from './tag/tag.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { CategoryModule } from './category/category.module';
+import { TagModule } from './tag/tag.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { join } from 'path';
     UserModule,
     OtpModule,
     QrdataModule,
+    CategoryModule,
     TagModule,
   ],
   controllers: [AppController],

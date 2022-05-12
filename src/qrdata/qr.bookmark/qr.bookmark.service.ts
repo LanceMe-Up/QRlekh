@@ -1,0 +1,76 @@
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { PrismaService } from '../../prisma.service';
+
+@Injectable()
+export class QrBookmarkService {
+  constructor(private readonly prismaService: PrismaService) {}
+
+  async getBookmark() {
+    try {
+      const data = await this.prismaService.qrBookmark.findMany({});
+      return { count: data.length, data };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async createQrBookmark(
+    dataBookmark: Prisma.QrBookmarkCreateInput,
+    qrlekhId: number,
+    userId: number,
+  ) {
+    try {
+      const data = await this.prismaService.qrBookmark.create({
+        data: {
+          expiryDate: dataBookmark.expiryDate,
+          qrlekhId,
+          userId,
+        },
+      });
+      return { data };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async createSubQrBookmark(
+    dataBookmark: Prisma.QrBookmarkCreateInput,
+    subQrlekhId: number,
+    userId: number,
+  ) {
+    try {
+      const data = await this.prismaService.qrBookmark.create({
+        data: {
+          expiryDate: dataBookmark.expiryDate,
+          subQrlekhId,
+          userId,
+        },
+      });
+      return { data };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async updateQrBookmark(
+    id: number,
+    dataBookmark: Prisma.QrBookmarkUpdateInput,
+    qrlekhId: number,
+  ) {
+    try {
+      const data = await this.prismaService.qrBookmark.update({
+        where: {
+          id,
+        },
+        data: {
+          expiryDate: dataBookmark.expiryDate,
+          qrlekhId,
+        },
+      });
+      return { data };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+}

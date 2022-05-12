@@ -18,8 +18,8 @@ import { JwtAuthGuard } from '../../@guards/jwt.guard';
 import { validateFileName, imageFileFilter } from '../../photo-validate';
 import { QrImageService } from './qr.image.service';
 
-@Controller('qrlekh')
-@ApiTags('qrlekh')
+@Controller('qrlekh-image')
+@ApiTags('qrlekh-image')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class QrImageController {

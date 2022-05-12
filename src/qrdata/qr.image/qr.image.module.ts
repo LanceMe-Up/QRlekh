@@ -1,12 +1,11 @@
 import { Module } from '@nestjs/common';
 import { PrismaService } from '../../prisma.service';
-import { SubQrImageController } from '../sub.qr.image/sub.qr.image.controller';
-import { SubQrImageModule } from '../sub.qr.image/sub.qr.image.module';
+import { QrImageController } from './qr.image.controller';
 import { QrImageService } from './qr.image.service';
 
 @Module({
-  imports: [SubQrImageModule],
-  controllers: [SubQrImageController],
+  imports: [],
+  controllers: [QrImageController],
   providers: [QrImageService, PrismaService],
   exports: [QrImageService],
 })

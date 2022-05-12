@@ -18,19 +18,19 @@ import { JwtAuthGuard } from '../../@guards/jwt.guard';
 import { validateFileName, imageFileFilter } from '../../photo-validate';
 import { QrImageService } from './qr.image.service';
 
-@Controller('qrlekh-sub-image')
-@ApiTags('qrlekh-sub-image')
+@Controller('qrlekh')
+@ApiTags('qrlekh')
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
-export class QrSubImageController {
+export class QrImageController {
   constructor(private readonly qrService: QrImageService) {}
 
-  @Get('/get-image')
+  @Get('/image')
   getQrlakeImage() {
     return this.qrService.getQrlekhImage();
   }
 
-  @Get('/get-gallery')
+  @Get('/gallery')
   getSubQrlakeImage() {
     return this.qrService.getQrlekhGallery();
   }
@@ -72,7 +72,7 @@ export class QrSubImageController {
     return await this.qrService.updateQrlekhImage(image, +id);
   }
 
-  @Post('/create-qr-gallery')
+  @Post('/create-gallery')
   @UseInterceptors(
     FilesInterceptor('gallery', 50, {
       storage: diskStorage({
@@ -100,7 +100,7 @@ export class QrSubImageController {
     return await this.qrService.createQrlekhGallery(+qrlekhId, galleryMap);
   }
 
-  @Patch('/update-qr-gallery:id')
+  @Patch('/update-gallery/:id')
   @UseInterceptors(
     FilesInterceptor('gallery', 50, {
       storage: diskStorage({

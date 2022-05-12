@@ -101,7 +101,7 @@ export class SubQrImageController {
     );
   }
 
-  @Patch('/update-sub-qr-gallery:id')
+  @Patch('/update-sub-qr-gallery/:id')
   @UseInterceptors(
     FilesInterceptor('gallery', 50, {
       storage: diskStorage({

@@ -72,14 +72,14 @@ model QrlekhData {
 
   desc String
 
-  like Int[]
+  like    Int[]
   dislike Int[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   gallery   QrlekhGallery?
-  favourite QrFavourite?
+  favourite QrFavourite[]
 
   User   User? @relation(fields: [userId], references: [id])
   userId Int?
@@ -89,7 +89,7 @@ model QrlekhData {
 
   tag TagName?
 
-  qrBookmark QrBookmark?
+  qrBookmark QrBookmark[]
 
   qrReviews QrReviews[]
 
@@ -111,20 +111,20 @@ model SubQrlekhData {
 
   desc String
 
-  like Int[]
+  like    Int[]
   dislike Int[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   gallery   SubQrlekhGallery?
-  favourite QrFavourite?
+  favourite QrFavourite[]
 
   User   User? @relation(fields: [userId], references: [id])
   userId Int?
 
   tag        TagName?
-  qrBookmark QrBookmark?
+  qrBookmark QrBookmark[]
   qrReviews  QrReviews[]
 
   QrlekhData   QrlekhData? @relation(fields: [qrlekhDataId], references: [id])
@@ -137,11 +137,11 @@ model QrLocation {
   lat  Float
   long Float
 
-  QrlekhData   QrlekhData? @relation(fields: [qrlekhId], references: [id])
-  qrlekhId Int?    
+  QrlekhData QrlekhData? @relation(fields: [qrlekhId], references: [id])
+  qrlekhId   Int?        @unique
 
   SubQrlekhData SubQrlekhData? @relation(fields: [subqrId], references: [id])
-  subqrId       Int?       
+  subqrId       Int?           @unique
 }
 
 model QrType {
@@ -214,10 +214,10 @@ model QrBookmark {
   userId Int?
 
   qrlekhData QrlekhData? @relation(fields: [qrlekhId], references: [id])
-  qrlekhId   Int?        @unique
+  qrlekhId   Int?
 
   SubQrlekhData SubQrlekhData? @relation(fields: [subQrlekhId], references: [id])
-  subQrlekhId   Int?           @unique
+  subQrlekhId   Int?
 }
 
 model QrFavourite {
@@ -228,12 +228,12 @@ model QrFavourite {
   updatedAt DateTime @updatedAt
 
   qrlekhData QrlekhData? @relation(fields: [qrlekhId], references: [id])
-  qrlekhId   Int?        @unique
+  qrlekhId   Int?
 
   user          User?          @relation(fields: [userId], references: [id])
   userId        Int?
   SubQrlekhData SubQrlekhData? @relation(fields: [subQrfavId], references: [id])
-  subQrfavId    Int?           @unique
+  subQrfavId    Int?
 }
 
 model TagName {

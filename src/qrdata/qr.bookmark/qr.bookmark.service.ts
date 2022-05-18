@@ -15,6 +15,55 @@ export class QrBookmarkService {
     }
   }
 
+  async findUserBookMark(uid: number) {
+    try {
+      const data = await this.prismaService.qrBookmark.findMany({
+        where: {
+          userId: uid,
+        },
+        include: {
+          qrlekhData: {
+            select: {
+              title: true,
+              desc: true,
+              knownFor: true,
+              image: {
+                select: {
+                  image: true,
+                },
+              },
+              gallery: {
+                select: {
+                  gallery: true,
+                },
+              },
+            },
+          },
+          SubQrlekhData: {
+            select: {
+              title: true,
+              desc: true,
+              knownFor: true,
+              image: {
+                select: {
+                  image: true,
+                },
+              },
+              gallery: {
+                select: {
+                  gallery: true,
+                },
+              },
+            },
+          },
+        },
+      });
+      return { count: data.length, data };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
   async createQrBookmark(
     dataBookmark: Prisma.QrBookmarkCreateInput,
     qrlekhId: number,

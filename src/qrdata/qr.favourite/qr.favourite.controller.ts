@@ -31,6 +31,13 @@ export class QrFavouriteController {
     return this.qrService.getFavourite();
   }
 
+  @Get('/show-favourite')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.USER)
+  showUserBookmark(@Request() req: any) {
+    return this.qrService.findUserFavourite(req.user.id);
+  }
+
   @Post()
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)

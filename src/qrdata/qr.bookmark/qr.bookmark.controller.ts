@@ -31,6 +31,13 @@ export class QrBookmarkController {
     return this.qrService.getBookmark();
   }
 
+  @Get('/show-bookmark')
+  @UseGuards(RolesGuard)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN, UserRole.USER)
+  showUserBookmark(@Request() req: any) {
+    return this.qrService.findUserBookMark(req.user.id);
+  }
+
   @Post('/qr-lekh')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)

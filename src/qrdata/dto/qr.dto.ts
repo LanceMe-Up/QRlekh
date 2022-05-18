@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class QrDto {
   @IsString()
@@ -23,12 +23,12 @@ export class QrDto {
   @ApiProperty()
   visitor: number;
 
-  @IsString()
+  @IsBoolean()
+  @IsOptional()
   @ApiProperty({
-    example: 'kathamandu',
-    description: 'What is the location of Temple?',
+    default: false,
   })
-  location: string;
+  isFeature: boolean;
 
   @IsString()
   @ApiProperty({

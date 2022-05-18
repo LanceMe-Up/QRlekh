@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 import { SlugifyService } from '../../slugify.service';
@@ -24,6 +29,7 @@ export class SubQrService {
           slug,
           visitor: createQr.visitor,
           location: createQr.location,
+          isFeature: createQr.isFeature,
           desc: createQr.desc,
           like: createQr.like,
           userId,
@@ -216,6 +222,139 @@ export class SubQrService {
         },
       });
       return data;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  // add a like
+  async getSubLike(postId: Prisma.SubQrlekhDataWhereUniqueInput, userId: any) {
+    try {
+      const post = await this.checkSubPostId(postId.id);
+      const alreadyLiked = post.like.includes(userId);
+      if (alreadyLiked) {
+        throw new HttpException('already liked this post', HttpStatus.CONFLICT);
+      }
+      await this.prismaService.subQrlekhData.update({
+        data: {
+          like: {
+            push: userId,
+          },
+        },
+        where: {
+          id: postId.id,
+        },
+      });
+      return { message: 'Post liked successfully' };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  // remove a like
+  async removeSubLike(
+    postId: Prisma.SubQrlekhDataWhereUniqueInput,
+    userId: any,
+  ) {
+    try {
+      const post = await this.checkSubPostId(postId.id);
+      const alreadyLiked = post.like.includes(userId);
+      if (!alreadyLiked) {
+        throw new HttpException(
+          'You already removed your like from this post',
+          HttpStatus.CONFLICT,
+        );
+      }
+      const newLikes = post.like.filter((x) => x !== userId);
+      await this.prismaService.subQrlekhData.update({
+        where: {
+          id: postId.id,
+        },
+        data: {
+          like: newLikes,
+        },
+      });
+      return { message: 'Removed like successfully' };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  // add a sub qr dislike
+  async getSubDisLike(
+    postId: Prisma.SubQrlekhDataWhereUniqueInput,
+    userId: any,
+  ) {
+    try {
+      const post = await this.checkSubPostId(postId.id);
+      const alreadyLiked = post.like.includes(userId);
+      if (alreadyLiked) {
+        throw new HttpException('already liked this post', HttpStatus.CONFLICT);
+      }
+      await this.prismaService.subQrlekhData.update({
+        data: {
+          dislike: {
+            push: userId,
+          },
+        },
+        where: {
+          id: postId.id,
+        },
+      });
+      return { message: 'Post liked successfully' };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  // remove a sub qr dislike
+  async removeSubDisLike(
+    postId: Prisma.SubQrlekhDataWhereUniqueInput,
+    userId: any,
+  ) {
+    try {
+      const post = await this.checkSubPostId(postId.id);
+      const alreadyLiked = post.dislike.includes(userId);
+      if (!alreadyLiked) {
+        throw new HttpException(
+          'You already removed your like from this post',
+          HttpStatus.CONFLICT,
+        );
+      }
+      const newLikes = post.dislike.filter((x) => x !== userId);
+      await this.prismaService.subQrlekhData.update({
+        where: {
+          id: postId.id,
+        },
+        data: {
+          dislike: newLikes,
+        },
+      });
+      return { message: 'Removed like successfully' };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async checkSubPostId(id: number) {
+    try {
+      const post = await this.prismaService.subQrlekhData.findUnique({
+        where: {
+          id,
+        },
+        include: {
+          User: {
+            select: {
+              id: true,
+              username: true,
+            },
+          },
+        },
+      });
+      if (!post) {
+        throw new BadRequestException({ message: `not found ${id}` });
+      }
+      return post;
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }

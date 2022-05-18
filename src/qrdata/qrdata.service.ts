@@ -27,14 +27,60 @@ export class QrdataService {
           knownFor: createQr.knownFor,
           title: createQr.title,
           slug,
-          location: createQr.location,
           visitor: createQr.visitor,
           desc: createQr.desc,
           like: createQr.like,
+          isFeature: createQr.isFeature,
           userId,
           categoryId,
         },
       });
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async updateQr(
+    createQr: Prisma.QrlekhDataUpdateInput,
+    userId: any,
+    categoryId: any,
+    slugs: string,
+  ) {
+    try {
+      const title: any = createQr.title;
+      const slug: string = this.slugifyService.toSlug(title);
+      return await this.prismaService.qrlekhData.updateMany({
+        where: {
+          slug: slugs,
+        },
+        data: {
+          knownFor: createQr.knownFor,
+          title: createQr.title,
+          slug,
+          visitor: createQr.visitor,
+          desc: createQr.desc,
+          like: createQr.like,
+          isFeature: createQr.isFeature,
+          userId,
+          categoryId,
+        },
+      });
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async updateFeature(isFeature: boolean, id: number) {
+    try {
+      await this.prismaService.qrlekhData.update({
+        data: {
+          isFeature,
+        },
+        where: {
+          id,
+        },
+      });
+      return { data: 'update successfully!' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
@@ -87,6 +133,9 @@ export class QrdataService {
             type: true,
           },
         },
+      },
+      orderBy: {
+        updatedAt: 'desc',
       },
     });
 
@@ -249,6 +298,33 @@ export class QrdataService {
     }
   }
 
+  // add a dis like from a qrlekh data
+  async getDisLike(postId: Prisma.QrlekhDataWhereUniqueInput, userId: any) {
+    try {
+      const post = await this.checkPostId(postId.id);
+      const alreadyLiked = post.like.includes(userId);
+      if (alreadyLiked) {
+        throw new HttpException(
+          'already disliked this post',
+          HttpStatus.CONFLICT,
+        );
+      }
+      await this.prismaService.qrlekhData.update({
+        data: {
+          dislike: {
+            push: userId,
+          },
+        },
+        where: {
+          id: postId.id,
+        },
+      });
+      return { message: 'Post disliked successfully' };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
+    }
+  }
+
   // remove a like from a qrlekh data
   async removeLike(postId: Prisma.QrlekhDataWhereUniqueInput, userId: any) {
     try {
@@ -275,54 +351,27 @@ export class QrdataService {
     }
   }
 
-  // add a like from a qrlekh data
-  async getSubLike(postId: Prisma.SubQrlekhDataWhereUniqueInput, userId: any) {
-    try {
-      const post = await this.checkSubPostId(postId.id);
-      const alreadyLiked = post.like.includes(userId);
-      if (alreadyLiked) {
-        throw new HttpException('already liked this post', HttpStatus.CONFLICT);
-      }
-      await this.prismaService.subQrlekhData.update({
-        data: {
-          like: {
-            push: userId,
-          },
-        },
-        where: {
-          id: postId.id,
-        },
-      });
-      return { message: 'Post liked successfully' };
-    } catch (e) {
-      throw new BadRequestException({ message: e.message });
-    }
-  }
-
-  // remove a like from a qrlekh data
-  async removeSubLike(
-    postId: Prisma.SubQrlekhDataWhereUniqueInput,
-    userId: any,
-  ) {
+  // remove a dis like from a qrlekh data
+  async removeDisLike(postId: Prisma.QrlekhDataWhereUniqueInput, userId: any) {
     try {
       const post = await this.checkPostId(postId.id);
-      const alreadyLiked = post.like.includes(userId);
+      const alreadyLiked = post.dislike.includes(userId);
       if (!alreadyLiked) {
         throw new HttpException(
-          'You already removed your like from this post',
+          'You already removed your dislike from this post',
           HttpStatus.CONFLICT,
         );
       }
-      const newLikes = post.like.filter((x) => x !== userId);
-      await this.prismaService.subQrlekhData.update({
+      const newLikes = post.dislike.filter((x) => x !== userId);
+      await this.prismaService.qrlekhData.update({
         where: {
           id: postId.id,
         },
         data: {
-          like: newLikes,
+          dislike: newLikes,
         },
       });
-      return { message: 'Removed like successfully' };
+      return { message: 'Removed dislike successfully' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
@@ -347,31 +396,6 @@ export class QrdataService {
     }
     return post;
   }
-
-  async checkSubPostId(id: number) {
-    try {
-      const post = await this.prismaService.subQrlekhData.findUnique({
-        where: {
-          id,
-        },
-        include: {
-          User: {
-            select: {
-              id: true,
-              username: true,
-            },
-          },
-        },
-      });
-      if (!post) {
-        throw new BadRequestException({ message: `not found ${id}` });
-      }
-      return post;
-    } catch (e) {
-      throw new BadRequestException({ message: e.message });
-    }
-  }
-
   // async deleteData(id: number) {
   //   await this.prismaService.qrlekhData.delete({
   //     where: { id: Number(id) },
@@ -379,6 +403,4 @@ export class QrdataService {
 
   //   return { success: true, data: `Delete with id ${id}` };
   // }
-
-  // start sub-child
 }

@@ -60,18 +60,20 @@ model Category {
 
 // parent
 model QrlekhData {
-  id       Int          @id @default(autoincrement())
-  knownFor String
-  title    String       @unique
-  slug     String
-  visitor  Int          @default(0)
-  image    QrlekhImage?
-  location String
-  type     QrType?
+  id        Int          @id @default(autoincrement())
+  knownFor  String
+  title     String       @unique
+  slug      String
+  visitor   Int          @default(0)
+  isFeature Boolean      @default(false)
+  image     QrlekhImage?
+  location  QrLocation?
+  type      QrType?
 
   desc String
 
   like Int[]
+  dislike Int[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -92,22 +94,25 @@ model QrlekhData {
   qrReviews QrReviews[]
 
   subQrlekh SubQrlekhData[]
+
 }
 
 // child
 model SubQrlekhData {
-  id       Int             @id @default(autoincrement())
-  knownFor String
-  title    String          @unique
-  slug     String
-  visitor  Int             @default(0)
-  image    SubQrlekhImage?
-  location String
-  type     QrType?
+  id        Int             @id @default(autoincrement())
+  knownFor  String
+  title     String          @unique
+  slug      String
+  visitor   Int             @default(0)
+  isFeature Boolean         @default(false)
+  image     SubQrlekhImage?
+  location  QrLocation?
+  type      QrType?
 
   desc String
 
   like Int[]
+  dislike Int[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -124,6 +129,19 @@ model SubQrlekhData {
 
   QrlekhData   QrlekhData? @relation(fields: [qrlekhDataId], references: [id])
   qrlekhDataId Int?
+}
+
+model QrLocation {
+  id   Int    @id @default(autoincrement())
+  name String
+  lat  Float
+  long Float
+
+  QrlekhData   QrlekhData? @relation(fields: [qrlekhId], references: [id])
+  qrlekhId Int?    
+
+  SubQrlekhData SubQrlekhData? @relation(fields: [subqrId], references: [id])
+  subqrId       Int?       
 }
 
 model QrType {
@@ -213,7 +231,7 @@ model QrFavourite {
   qrlekhId   Int?        @unique
 
   user          User?          @relation(fields: [userId], references: [id])
-  userId        Int? 
+  userId        Int?
   SubQrlekhData SubQrlekhData? @relation(fields: [subQrfavId], references: [id])
   subQrfavId    Int?           @unique
 }

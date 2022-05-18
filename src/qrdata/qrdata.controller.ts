@@ -51,23 +51,27 @@ export class QrdataController {
     return this.qrService.getLike({ id: Number(id) }, req.user.id);
   }
 
+  @Patch('/:id/dislikes')
+  countdisLike(@Param('id') id: string, @Request() req: any) {
+    return this.qrService.getDisLike({ id: Number(id) }, req.user.id);
+  }
+
   // remove a Like to a Post
   @Delete(':id/likes')
   removeLike(@Request() req: any, @Param('id') id: string) {
     return this.qrService.removeLike({ id: Number(id) }, req.user.id);
   }
 
-  // like a sub child Like to a Post
-  @Patch('/:id/sub-likes')
-  countsubLike(@Param('id') id: string, @Request() req: any) {
-    return this.qrService.getSubLike({ id: Number(id) }, req.user.id);
+  // remove a disLike to a Post
+  @Delete(':id/dislikes')
+  removedisLike(@Request() req: any, @Param('id') id: string) {
+    return this.qrService.removeDisLike({ id: Number(id) }, req.user.id);
   }
 
-  // remove a sub child Like to a Post
-  @Delete('/:id/sub-likes/remove')
-  @UseGuards(JwtAuthGuard)
-  removesubLike(@Request() req: any, @Param('id') id: string) {
-    return this.qrService.removeSubLike({ id: Number(id) }, req.user.id);
+  // update - show Features
+  @Patch('/update/:id/features')
+  updateFeat(@Param('id') id: number, @Body('isFeature') isFeature: boolean) {
+    return this.qrService.updateFeature(isFeature, +id);
   }
 
   // @Delete(':id')

@@ -4,6 +4,7 @@ import { SlugifyService } from '../slugify.service';
 import { QrBookmarkModule } from './qr.bookmark/qr.bookmark.module';
 import { QrFavouriteModule } from './qr.favourite/qr.favourite.module';
 import { QrImageModule } from './qr.image/qr.image.module';
+import { QrLocationModule } from './qr.location/qr.location.module';
 import { QrReviewModule } from './qr.reviews/qr.reviews.module';
 import { QrdataController } from './qrdata.controller';
 import { QrdataService } from './qrdata.service';
@@ -20,6 +21,7 @@ import { SubQrModule } from './sub.qr/sub.qr.module';
     QrReviewModule,
     QrBookmarkModule,
     QrFavouriteModule,
+    QrLocationModule,
   ],
   controllers: [QrdataController],
   providers: [QrdataService, PrismaService, SlugifyService],

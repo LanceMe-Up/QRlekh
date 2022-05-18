@@ -16,6 +16,7 @@ import { Roles } from '../../roles.decorates';
 import {
   CreateQrLocationDto,
   CreateSubQrLocationDto,
+  GetLocationDto,
 } from './dto/create.location.dto';
 import { QrLocationService } from './qr.location.service';
 
@@ -44,6 +45,16 @@ export class QrLocationController {
       skip: Number(skip),
       limit: Number(limit) || 7,
     });
+  }
+
+  @Get('/nearby')
+  findAllByRadius(
+    @Query()
+    getLocationProjectDto: GetLocationDto,
+  ) {
+    // const ip = req.clientIp;
+    // getLocationProjectDto.ip_address = ip;
+    return this.qrService.findAllByRadius(getLocationProjectDto);
   }
 
   @Post()

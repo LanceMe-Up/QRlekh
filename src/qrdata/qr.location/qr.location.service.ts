@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
+import { GetLocationDto } from './dto/create.location.dto';
+import geoip from 'geoip-lite';
 
 @Injectable()
 export class QrLocationService {
@@ -16,7 +18,7 @@ export class QrLocationService {
     console.log(skip, limit);
     try {
       const data = await this.prismaService
-        .$queryRaw`SELECT *, ST_DISTANCE_SPHERE(POINT(${long}, ${lat}), POINT(long, lat)) AS dist from QrLocation`;
+        .$queryRaw`SELECT *, (point(long, lat) <@> point(${long}, ${lat})) AS distance from "QrLocation" WHERE (point(long, lat) <@> point(${long}, ${lat}))`;
       if (!data) {
         return { md: 'not found' };
       }
@@ -25,6 +27,8 @@ export class QrLocationService {
       throw new BadRequestException({ message: err.message });
     }
   }
+  // const data = await this.prismaService
+  // .$queryRaw`SELECT *, ST_DISTANCE_SPHERE(POINT(${long}, ${lat}), POINT(long, lat)) AS dist from "QrLocation"`;
 
   async getLocation() {
     try {
@@ -51,6 +55,33 @@ export class QrLocationService {
       return { data };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async findAllByRadius(getLocationProjectDto: GetLocationDto) {
+    const { ip_address, radius, is_metric, long, lat } = getLocationProjectDto;
+    let loni = long;
+    let lati = lat;
+    // FALLBACK TO IP_ADDRESS
+    if (!long || !lat) {
+      if (ip_address) {
+        let geo = null;
+        try {
+          geo = await geoip.lookup(ip_address);
+        } catch {}
+
+        if (geo) {
+          loni = geo.ll[0];
+          lati = geo.ll[1];
+        }
+      }
+    }
+    if (loni && lati) {
+      return await this.prismaService
+        .$queryRaw`SELECT *, (point(long, lat) <@> point(${loni}, ${lati})) AS distance
+          FROM "QrLocation"
+          WHERE (point(long, lat) <@> point(${loni}, ${lati})) <= 
+          ${radius * (is_metric ? 1000 : 1609.34)}`;
     }
   }
 

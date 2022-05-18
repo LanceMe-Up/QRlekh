@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 
@@ -70,6 +75,13 @@ export class QrBookmarkService {
     userId: number,
   ) {
     try {
+      const bookmarkCheck = await this.checBookmarkId(qrlekhId);
+      if (bookmarkCheck) {
+        throw new HttpException(
+          'already bookmark this qrlekh',
+          HttpStatus.CONFLICT,
+        );
+      }
       const data = await this.prismaService.qrBookmark.create({
         data: {
           expiryDate: dataBookmark.expiryDate,
@@ -89,6 +101,13 @@ export class QrBookmarkService {
     userId: number,
   ) {
     try {
+      const bookmarkCheck = await this.checBookmarkId(subQrlekhId);
+      if (bookmarkCheck) {
+        throw new HttpException(
+          'already sub bookmark this qrlekh',
+          HttpStatus.CONFLICT,
+        );
+      }
       const data = await this.prismaService.qrBookmark.create({
         data: {
           expiryDate: dataBookmark.expiryDate,
@@ -121,5 +140,17 @@ export class QrBookmarkService {
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
+  }
+
+  async checBookmarkId(qrlekhId: number) {
+    const post = await this.prismaService.qrFavourite.findMany({
+      where: {
+        qrlekhId,
+      },
+    });
+    if (!post) {
+      throw new BadRequestException({ message: `not found ${qrlekhId}` });
+    }
+    return post;
   }
 }

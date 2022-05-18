@@ -1,4 +1,9 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 
@@ -70,6 +75,13 @@ export class QrFavouriteService {
     userId: number,
   ) {
     try {
+      const fav = await this.checkFavouriteId(qrlekhId);
+      if (fav) {
+        throw new HttpException(
+          'already favourite this post',
+          HttpStatus.CONFLICT,
+        );
+      }
       const data = await this.prismaService.qrFavourite.create({
         data: {
           favourite: dataFav.favourite,
@@ -89,6 +101,13 @@ export class QrFavouriteService {
     userId: number,
   ) {
     try {
+      const fav = await this.checkFavouriteId(subQrfavId);
+      if (fav) {
+        throw new HttpException(
+          'already favourite this post',
+          HttpStatus.CONFLICT,
+        );
+      }
       const data = await this.prismaService.qrFavourite.create({
         data: {
           favourite: dataFav.favourite,
@@ -121,5 +140,17 @@ export class QrFavouriteService {
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
+  }
+
+  async checkFavouriteId(qrlekhId: number) {
+    const post = await this.prismaService.qrFavourite.findMany({
+      where: {
+        qrlekhId,
+      },
+    });
+    if (!post) {
+      throw new BadRequestException({ message: `not found ${qrlekhId}` });
+    }
+    return post;
   }
 }

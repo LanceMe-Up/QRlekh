@@ -10,7 +10,11 @@ async function bootstrap() {
     origin: '*',
     credentials: true,
   });
-  app.use(helmet());
+  app.use(
+    helmet({
+      crossOriginResourcePolicy: false,
+    }),
+  );
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()

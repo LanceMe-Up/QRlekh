@@ -133,6 +133,13 @@ export class QrdataService {
             type: true,
           },
         },
+        location: {
+          select: {
+            lat: true,
+            long: true,
+            name: true,
+          },
+        },
       },
       orderBy: {
         updatedAt: 'desc',
@@ -191,6 +198,13 @@ export class QrdataService {
           type: {
             select: {
               type: true,
+            },
+          },
+          location: {
+            select: {
+              lat: true,
+              long: true,
+              name: true,
             },
           },
         },
@@ -263,6 +277,13 @@ export class QrdataService {
           type: {
             select: {
               type: true,
+            },
+          },
+          location: {
+            select: {
+              lat: true,
+              long: true,
+              name: true,
             },
           },
         },

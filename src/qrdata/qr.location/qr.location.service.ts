@@ -18,7 +18,8 @@ export class QrLocationService {
     console.log(skip, limit);
     try {
       const data = await this.prismaService
-        .$queryRaw`SELECT *, (point(long, lat) <@> point(${long}, ${lat})) AS distance from "QrLocation" WHERE (point(long, lat) <@> point(${long}, ${lat}))`;
+        .$queryRaw`SELECT *, ST_DistanceSphere(POINT(${long}, ${lat}), POINT(long, lat)) AS dist from "QrLocation"`;
+      // .$queryRaw`SELECT *, (point(long, lat) <@> point(${long}, ${lat})) AS distance from "QrLocation" WHERE (point(long, lat) <@> point(${long}, ${lat}))`;
       if (!data) {
         return { md: 'not found' };
       }
@@ -27,6 +28,7 @@ export class QrLocationService {
       throw new BadRequestException({ message: err.message });
     }
   }
+  // ST_DistanceSphere
   // const data = await this.prismaService
   // .$queryRaw`SELECT *, ST_DISTANCE_SPHERE(POINT(${long}, ${lat}), POINT(long, lat)) AS dist from "QrLocation"`;
 

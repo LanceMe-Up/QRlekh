@@ -57,9 +57,10 @@ CREATE TABLE "QrlekhData" (
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "visitor" INTEGER NOT NULL DEFAULT 0,
-    "location" TEXT NOT NULL,
+    "isFeature" BOOLEAN NOT NULL DEFAULT false,
     "desc" TEXT NOT NULL,
     "like" INTEGER[],
+    "dislike" INTEGER[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER,
@@ -75,15 +76,28 @@ CREATE TABLE "SubQrlekhData" (
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
     "visitor" INTEGER NOT NULL DEFAULT 0,
-    "location" TEXT NOT NULL,
+    "isFeature" BOOLEAN NOT NULL DEFAULT false,
     "desc" TEXT NOT NULL,
     "like" INTEGER[],
+    "dislike" INTEGER[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER,
     "qrlekhDataId" INTEGER,
 
     CONSTRAINT "SubQrlekhData_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "QrLocation" (
+    "id" SERIAL NOT NULL,
+    "name" TEXT NOT NULL,
+    "lat" DOUBLE PRECISION NOT NULL,
+    "long" DOUBLE PRECISION NOT NULL,
+    "qrlekhId" INTEGER,
+    "subqrId" INTEGER,
+
+    CONSTRAINT "QrLocation_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -206,6 +220,12 @@ CREATE UNIQUE INDEX "QrlekhData_title_key" ON "QrlekhData"("title");
 CREATE UNIQUE INDEX "SubQrlekhData_title_key" ON "SubQrlekhData"("title");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "QrLocation_qrlekhId_key" ON "QrLocation"("qrlekhId");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "QrLocation_subqrId_key" ON "QrLocation"("subqrId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "QrType_qrlekhId_key" ON "QrType"("qrlekhId");
 
 -- CreateIndex
@@ -222,21 +242,6 @@ CREATE UNIQUE INDEX "SubQrlekhImage_subQrImageId_key" ON "SubQrlekhImage"("subQr
 
 -- CreateIndex
 CREATE UNIQUE INDEX "SubQrlekhGallery_subQrImageId_key" ON "SubQrlekhGallery"("subQrImageId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "QrBookmark_qrlekhId_key" ON "QrBookmark"("qrlekhId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "QrBookmark_subQrlekhId_key" ON "QrBookmark"("subQrlekhId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "QrFavourite_qrlekhId_key" ON "QrFavourite"("qrlekhId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "QrFavourite_userId_key" ON "QrFavourite"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "QrFavourite_subQrfavId_key" ON "QrFavourite"("subQrfavId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "TagName_qrlekhId_key" ON "TagName"("qrlekhId");
@@ -264,6 +269,12 @@ ALTER TABLE "SubQrlekhData" ADD CONSTRAINT "SubQrlekhData_userId_fkey" FOREIGN K
 
 -- AddForeignKey
 ALTER TABLE "SubQrlekhData" ADD CONSTRAINT "SubQrlekhData_qrlekhDataId_fkey" FOREIGN KEY ("qrlekhDataId") REFERENCES "QrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "QrLocation" ADD CONSTRAINT "QrLocation_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "QrLocation" ADD CONSTRAINT "QrLocation_subqrId_fkey" FOREIGN KEY ("subqrId") REFERENCES "SubQrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "QrType" ADD CONSTRAINT "QrType_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE SET NULL ON UPDATE CASCADE;

@@ -13,7 +13,44 @@ export class QrBookmarkService {
 
   async getBookmark() {
     try {
-      const data = await this.prismaService.qrBookmark.findMany({});
+      const data = await this.prismaService.qrBookmark.findMany({
+        include: {
+          qrlekhData: {
+            select: {
+              title: true,
+              desc: true,
+              knownFor: true,
+              image: {
+                select: {
+                  image: true,
+                },
+              },
+              gallery: {
+                select: {
+                  gallery: true,
+                },
+              },
+            },
+          },
+          SubQrlekhData: {
+            select: {
+              title: true,
+              desc: true,
+              knownFor: true,
+              image: {
+                select: {
+                  image: true,
+                },
+              },
+              gallery: {
+                select: {
+                  gallery: true,
+                },
+              },
+            },
+          },
+        },
+      });
       return { count: data.length, data };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
@@ -75,8 +112,8 @@ export class QrBookmarkService {
     userId: number,
   ) {
     try {
-      const bookmarkCheck = await this.checBookmarkId(qrlekhId);
-      if (bookmarkCheck) {
+      const bookmarkCheck = await this.checBookmarkId(userId, qrlekhId);
+      if (bookmarkCheck.length !== 0) {
         throw new HttpException(
           'already bookmark this qrlekh',
           HttpStatus.CONFLICT,
@@ -95,14 +132,27 @@ export class QrBookmarkService {
     }
   }
 
+  async checksubBookmarkId(userId: number, subQrlekhId: number) {
+    const post = await this.prismaService.qrBookmark.findMany({
+      where: {
+        userId,
+        subQrlekhId,
+      },
+    });
+    if (!post) {
+      throw new BadRequestException({ message: `not found ${userId}` });
+    }
+    return post;
+  }
+
   async createSubQrBookmark(
     dataBookmark: Prisma.QrBookmarkCreateInput,
     subQrlekhId: number,
     userId: number,
   ) {
     try {
-      const bookmarkCheck = await this.checBookmarkId(subQrlekhId);
-      if (bookmarkCheck) {
+      const bookmarkCheck = await this.checksubBookmarkId(userId, subQrlekhId);
+      if (bookmarkCheck.length !== 0) {
         throw new HttpException(
           'already sub bookmark this qrlekh',
           HttpStatus.CONFLICT,
@@ -123,17 +173,17 @@ export class QrBookmarkService {
 
   async updateQrBookmark(
     id: number,
+    userId: number,
     dataBookmark: Prisma.QrBookmarkUpdateInput,
-    qrlekhId: number,
   ) {
     try {
-      const data = await this.prismaService.qrBookmark.update({
+      const data = await this.prismaService.qrBookmark.updateMany({
         where: {
           id,
+          userId,
         },
         data: {
           expiryDate: dataBookmark.expiryDate,
-          qrlekhId,
         },
       });
       return { data };
@@ -142,9 +192,10 @@ export class QrBookmarkService {
     }
   }
 
-  async checBookmarkId(qrlekhId: number) {
+  async checBookmarkId(userId: number, qrlekhId: number) {
     const post = await this.prismaService.qrFavourite.findMany({
       where: {
+        userId,
         qrlekhId,
       },
     });

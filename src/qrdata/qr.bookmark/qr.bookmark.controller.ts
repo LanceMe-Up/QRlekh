@@ -62,7 +62,11 @@ export class QrBookmarkController {
   @Patch('/:id')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
-  updateQrBookmark(@Param('id') id: string, @Body() data: CreateQrBookmarkDto) {
-    return this.qrService.updateQrBookmark(+id, data, data.qrlekhId);
+  updateQrBookmark(
+    @Param('id') id: string,
+    @Body() data: CreateQrBookmarkDto,
+    @Request() req: any,
+  ) {
+    return this.qrService.updateQrBookmark(+id, req.user.id, data);
   }
 }

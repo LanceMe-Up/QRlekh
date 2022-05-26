@@ -214,6 +214,9 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "ProfileImage_userId_key" ON "ProfileImage"("userId");
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Category_name_key" ON "Category"("name");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "QrlekhData_title_key" ON "QrlekhData"("title");
 
 -- CreateIndex

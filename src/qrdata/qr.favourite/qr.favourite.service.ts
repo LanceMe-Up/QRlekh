@@ -13,7 +13,47 @@ export class QrFavouriteService {
 
   async getFavourite() {
     try {
-      const data = await this.prismaService.qrFavourite.findMany();
+      const data = await this.prismaService.qrFavourite.findMany({
+        include: {
+          qrlekhData: {
+            select: {
+              title: true,
+              desc: true,
+              knownFor: true,
+              image: {
+                select: {
+                  image: true,
+                },
+              },
+              gallery: {
+                select: {
+                  gallery: true,
+                },
+              },
+            },
+          },
+          SubQrlekhData: {
+            select: {
+              title: true,
+              desc: true,
+              knownFor: true,
+              image: {
+                select: {
+                  image: true,
+                },
+              },
+              gallery: {
+                select: {
+                  gallery: true,
+                },
+              },
+            },
+          },
+        },
+        orderBy: {
+          updatedAt: 'desc',
+        },
+      });
       return { count: data.length, data };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
@@ -62,6 +102,9 @@ export class QrFavouriteService {
             },
           },
         },
+        orderBy: {
+          updatedAt: 'desc',
+        },
       });
       return { count: data.length, data };
     } catch (e) {
@@ -75,24 +118,51 @@ export class QrFavouriteService {
     userId: number,
   ) {
     try {
-      const fav = await this.checkFavouriteId(qrlekhId);
-      if (fav) {
+      const fav = await this.checkFavouriteId(userId, qrlekhId);
+      if (fav.length !== 0) {
         throw new HttpException(
           'already favourite this post',
           HttpStatus.CONFLICT,
         );
+      } else {
+        const data = await this.prismaService.qrFavourite.create({
+          data: {
+            favourite: dataFav.favourite,
+            qrlekhId,
+            userId,
+          },
+        });
+        return { data };
       }
-      const data = await this.prismaService.qrFavourite.create({
-        data: {
-          favourite: dataFav.favourite,
-          qrlekhId,
-          userId,
-        },
-      });
-      return { data };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
+  }
+
+  async checkFavouriteId(userId: number, qrlekhId: number) {
+    const post = await this.prismaService.qrFavourite.findMany({
+      where: {
+        userId,
+        qrlekhId,
+      },
+    });
+    if (!post) {
+      throw new BadRequestException({ message: `not found ${userId}` });
+    }
+    return post;
+  }
+
+  async checksubFavouriteId(userId: number, subQrfavId: number) {
+    const post = await this.prismaService.qrFavourite.findMany({
+      where: {
+        userId,
+        subQrfavId,
+      },
+    });
+    if (!post) {
+      throw new BadRequestException({ message: `not found ${userId}` });
+    }
+    return post;
   }
 
   async createSubQrFavourite(
@@ -101,8 +171,8 @@ export class QrFavouriteService {
     userId: number,
   ) {
     try {
-      const fav = await this.checkFavouriteId(subQrfavId);
-      if (fav) {
+      const fav = await this.checksubFavouriteId(userId, subQrfavId);
+      if (fav.length !== 0) {
         throw new HttpException(
           'already favourite this post',
           HttpStatus.CONFLICT,
@@ -123,34 +193,51 @@ export class QrFavouriteService {
 
   async updateQrFavourite(
     id: number,
+    userId: number,
     dataFav: Prisma.QrFavouriteUpdateInput,
-    qrlekhId: number,
   ) {
     try {
-      const data = await this.prismaService.qrFavourite.update({
-        where: {
-          id,
-        },
-        data: {
-          favourite: dataFav.favourite,
-          qrlekhId,
-        },
-      });
-      return { data };
+      const check = await this.findUserFavourite(userId);
+      if (check) {
+        const data = await this.prismaService.qrFavourite.updateMany({
+          where: {
+            id,
+            userId,
+          },
+          data: {
+            favourite: dataFav.favourite,
+          },
+        });
+        return { data };
+      }
+      return { msg: 'no' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
   }
 
-  async checkFavouriteId(qrlekhId: number) {
-    const post = await this.prismaService.qrFavourite.findMany({
-      where: {
-        qrlekhId,
-      },
-    });
-    if (!post) {
-      throw new BadRequestException({ message: `not found ${qrlekhId}` });
+  async updateSubQrFavourite(
+    id: number,
+    userId: number,
+    dataFav: Prisma.QrFavouriteUpdateInput,
+  ) {
+    try {
+      const check = await this.findUserFavourite(userId);
+      if (check) {
+        const data = await this.prismaService.qrFavourite.updateMany({
+          where: {
+            id,
+            userId,
+          },
+          data: {
+            favourite: dataFav.favourite,
+          },
+        });
+        return { data };
+      }
+      return { msg: 'no' };
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
     }
-    return post;
   }
 }

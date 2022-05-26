@@ -8,13 +8,23 @@ export class CategoryService {
 
   async createCategory(dataCategory: Prisma.CategoryCreateInput, userId: any) {
     try {
-      const data = await this.prismaService.category.create({
+      const checkName = await this.prismaService.category.findMany({
+        where: {
+          name: {
+            mode: 'insensitive',
+          },
+        },
+      });
+      console.log(checkName);
+      if (checkName) {
+        return { msg: 'name must be unique' };
+      }
+      const data = this.prismaService.category.create({
         data: {
           name: dataCategory.name,
           userId,
         },
       });
-
       return data;
     } catch (e) {
       throw new BadRequestException({ log: e.message });
@@ -24,6 +34,11 @@ export class CategoryService {
   async getCategory() {
     try {
       const data = await this.prismaService.category.findMany({
+        where: {
+          name: {
+            mode: 'insensitive',
+          },
+        },
         include: {
           User: {
             select: {

@@ -16,6 +16,7 @@ import { Roles } from '../../roles.decorates';
 import {
   CreateQrFavouriteDto,
   CreateSubQrFavouriteDto,
+  UpdateQrFavouriteDto,
 } from '../dto/favourite.dto';
 import { QrFavouriteService } from './qr.favourite.service';
 
@@ -42,7 +43,7 @@ export class QrFavouriteController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
   createQrFavourite(@Body() data: CreateQrFavouriteDto, @Request() req: any) {
-    return this.qrService.createQrFavourite(data, data.qrlekhId, req.user.id);
+    return this.qrService.createQrFavourite(data, +data.qrlekhId, req.user.id);
   }
 
   @Post('/sub/qrlekh')
@@ -59,10 +60,14 @@ export class QrFavouriteController {
     );
   }
 
-  @Patch('/:id')
+  @Patch('/:id/update-qr')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
-  updateFavourite(@Param('id') id: string, @Body() data: CreateQrFavouriteDto) {
-    return this.qrService.updateQrFavourite(+id, data, data.qrlekhId);
+  updateFavourite(
+    @Param('id') id: string,
+    @Request() req: any,
+    @Body() data: UpdateQrFavouriteDto,
+  ) {
+    return this.qrService.updateQrFavourite(+id, req.user.id, data);
   }
 }

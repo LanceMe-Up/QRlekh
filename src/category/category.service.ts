@@ -11,12 +11,12 @@ export class CategoryService {
       const checkName = await this.prismaService.category.findMany({
         where: {
           name: {
+            contains: dataCategory.name,
             mode: 'insensitive',
           },
         },
       });
-      console.log(checkName);
-      if (checkName) {
+      if (checkName.length !== 0) {
         return { msg: 'name must be unique' };
       }
       const data = this.prismaService.category.create({

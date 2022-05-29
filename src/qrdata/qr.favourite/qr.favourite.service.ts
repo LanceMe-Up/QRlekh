@@ -210,7 +210,7 @@ export class QrFavouriteService {
         });
         return { data };
       }
-      return { msg: 'no' };
+      return { msg: 'not found' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }

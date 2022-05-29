@@ -106,12 +106,12 @@ export class QrBookmarkService {
     }
   }
 
-  async createQrBookmark(
-    dataBookmark: Prisma.QrBookmarkCreateInput,
-    qrlekhId: number,
-    userId: number,
-  ) {
+  async createQrBookmark(qrlekhId: number, userId: number) {
     try {
+      // calculate date from 7 days
+      const date = new Date();
+      date.setDate(date.getDate() + 7);
+
       const bookmarkCheck = await this.checBookmarkId(userId, qrlekhId);
       if (bookmarkCheck.length !== 0) {
         throw new HttpException(
@@ -121,8 +121,8 @@ export class QrBookmarkService {
       }
       const data = await this.prismaService.qrBookmark.create({
         data: {
-          expiryDate: dataBookmark.expiryDate,
-          qrlekhId,
+          expiryDate: date,
+          isBookmark: true,
           userId,
         },
       });
@@ -145,12 +145,12 @@ export class QrBookmarkService {
     return post;
   }
 
-  async createSubQrBookmark(
-    dataBookmark: Prisma.QrBookmarkCreateInput,
-    subQrlekhId: number,
-    userId: number,
-  ) {
+  async createSubQrBookmark(subQrlekhId: number, userId: number) {
     try {
+      // calculate date from 7 days
+      const subqrdate = new Date();
+      subqrdate.setDate(subqrdate.getDate() + 7);
+
       const bookmarkCheck = await this.checksubBookmarkId(userId, subQrlekhId);
       if (bookmarkCheck.length !== 0) {
         throw new HttpException(
@@ -160,7 +160,8 @@ export class QrBookmarkService {
       }
       const data = await this.prismaService.qrBookmark.create({
         data: {
-          expiryDate: dataBookmark.expiryDate,
+          expiryDate: subqrdate,
+          isBookmark: true,
           subQrlekhId,
           userId,
         },
@@ -177,23 +178,30 @@ export class QrBookmarkService {
     dataBookmark: Prisma.QrBookmarkUpdateInput,
   ) {
     try {
-      const data = await this.prismaService.qrBookmark.updateMany({
-        where: {
-          id,
-          userId,
-        },
-        data: {
-          expiryDate: dataBookmark.expiryDate,
-        },
-      });
-      return { data };
+      const expirDate = new Date();
+      expirDate.setDate(expirDate.getDate() + 7);
+      const check = await this.findUserBookMark(userId);
+      if (check) {
+        const data = await this.prismaService.qrBookmark.updateMany({
+          where: {
+            id,
+            userId,
+          },
+          data: {
+            expiryDate: expirDate,
+            isBookmark: dataBookmark.isBookmark,
+          },
+        });
+        return { data };
+      }
+      return { msg: 'not found' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
   }
 
   async checBookmarkId(userId: number, qrlekhId: number) {
-    const post = await this.prismaService.qrFavourite.findMany({
+    const post = await this.prismaService.qrBookmark.findMany({
       where: {
         userId,
         qrlekhId,

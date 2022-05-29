@@ -16,6 +16,7 @@ import { Roles } from '../../roles.decorates';
 import {
   CreateQrBookmarkDto,
   CreateSubQrBookmarkDto,
+  UpdateQrBookmarkDto,
 } from '../dto/bookmark.dto';
 import { QrBookmarkService } from './qr.bookmark.service';
 
@@ -42,7 +43,7 @@ export class QrBookmarkController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
   createQrBookmark(@Body() data: CreateQrBookmarkDto, @Request() req: any) {
-    return this.qrService.createQrBookmark(data, data.qrlekhId, req.user.id);
+    return this.qrService.createQrBookmark(data.qrlekhId, req.user.id);
   }
 
   @Post('/sub-qr-lekh')
@@ -52,19 +53,15 @@ export class QrBookmarkController {
     @Body() data: CreateSubQrBookmarkDto,
     @Request() req: any,
   ) {
-    return this.qrService.createSubQrBookmark(
-      data,
-      data.subQrlekhId,
-      req.user.id,
-    );
+    return this.qrService.createSubQrBookmark(data.subQrlekhId, req.user.id);
   }
 
-  @Patch('/:id')
+  @Patch('/:id/update-bookmark')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
   updateQrBookmark(
     @Param('id') id: string,
-    @Body() data: CreateQrBookmarkDto,
+    @Body() data: UpdateQrBookmarkDto,
     @Request() req: any,
   ) {
     return this.qrService.updateQrBookmark(+id, req.user.id, data);

@@ -89,6 +89,12 @@ export class QrdataService {
   async get() {
     const data = await this.prismaService.qrlekhData.findMany({
       include: {
+        Category: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
         User: {
           select: {
             username: true,
@@ -156,6 +162,12 @@ export class QrdataService {
           id: id.id,
         },
         include: {
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           User: {
             select: {
               username: true,
@@ -235,6 +247,12 @@ export class QrdataService {
           slug,
         },
         include: {
+          Category: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
           User: {
             select: {
               username: true,

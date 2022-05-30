@@ -11,6 +11,10 @@ export class TagQrDto {
   tagName: string[];
 
   @IsNumber()
+  @ApiProperty({
+    example: 1,
+    description: 'should be qrlekhId',
+  })
   qrlekhId: number;
 }
 
@@ -24,5 +28,9 @@ export class TagSubQrDto {
   tagName: string[];
 
   @IsNumber()
+  @ApiProperty({
+    example: 1,
+    description: 'should be subtagId',
+  })
   subtagId: number;
 }

@@ -42,5 +42,9 @@ export class QrDto {
   like: number[];
 
   @IsNumber()
+  @ApiProperty({
+    example: 1,
+    description: 'should be field of categoryId',
+  })
   categoryId: number;
 }

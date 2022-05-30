@@ -106,6 +106,19 @@ export class QrBookmarkService {
     }
   }
 
+  async checBookmarkId(userId: number, qrlekhId: number) {
+    const post = await this.prismaService.qrBookmark.findMany({
+      where: {
+        userId,
+        qrlekhId,
+      },
+    });
+    if (!post) {
+      throw new BadRequestException({ message: `not found ${qrlekhId}` });
+    }
+    return post;
+  }
+
   async createQrBookmark(qrlekhId: number, userId: number) {
     try {
       // calculate date from 7 days
@@ -124,6 +137,7 @@ export class QrBookmarkService {
           expiryDate: date,
           isBookmark: true,
           userId,
+          qrlekhId,
         },
       });
       return { data };
@@ -198,18 +212,5 @@ export class QrBookmarkService {
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
-  }
-
-  async checBookmarkId(userId: number, qrlekhId: number) {
-    const post = await this.prismaService.qrBookmark.findMany({
-      where: {
-        userId,
-        qrlekhId,
-      },
-    });
-    if (!post) {
-      throw new BadRequestException({ message: `not found ${qrlekhId}` });
-    }
-    return post;
   }
 }

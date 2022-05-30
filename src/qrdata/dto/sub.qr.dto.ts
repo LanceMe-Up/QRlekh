@@ -47,5 +47,9 @@ export class SubQrDto {
   like: number[];
 
   @IsNumber()
+  @ApiProperty({
+    description: 'should be field of qrlekhDataId',
+    example: 1,
+  })
   qrlekhDataId: number;
 }

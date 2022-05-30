@@ -46,7 +46,7 @@ export class TagController {
   @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
   @Post('/sub/qr')
   async createSubQr(@Body() dto: TagSubQrDto) {
-    return this.tagService.createQrTag(dto, dto.subtagId);
+    return this.tagService.createSubQrTag(dto, dto.subtagId);
   }
 
   @UseGuards(RolesGuard)

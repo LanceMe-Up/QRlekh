@@ -13,9 +13,19 @@ export class UpdateTagDto {
 
   @IsNumber()
   @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    description: 'should be subtagId',
+  })
   subtagId: number;
 
   @IsNumber()
   @IsOptional()
+  @IsNumber()
+  @ApiProperty({
+    example: 1,
+    description: 'should be qrlekhId',
+  })
   qrlekhId: number;
 }

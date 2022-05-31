@@ -38,7 +38,28 @@ export class QrImageService {
 
   async getQrlekhImage() {
     try {
-      const data = await this.prismaService.qrlekhImage.findMany({});
+      const data = await this.prismaService.qrlekhImage.findMany({
+        include: {
+          QrImageMapping: {
+            select: {
+              id: true,
+              desc: true,
+              title: true,
+              shape: true,
+              coords: true,
+              preFillColor: true,
+              fillColor: true,
+              strokeColor: true,
+            },
+          },
+          QrlekhData: {
+            select: {
+              id: true,
+              title: true,
+            },
+          },
+        },
+      });
 
       return { count: data.length, data };
     } catch (e) {

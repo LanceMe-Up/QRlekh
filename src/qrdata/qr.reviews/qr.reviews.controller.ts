@@ -16,7 +16,7 @@ import { QrReviewService } from './qr.reviews.service';
 
 @ApiTags('review')
 @Controller('review')
-export class TourReviewController {
+export class QrReviewController {
   constructor(private readonly reviewService: QrReviewService) {}
 
   @Get()

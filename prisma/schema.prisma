@@ -167,6 +167,24 @@ model QrlekhImage {
 
   QrlekhData QrlekhData @relation(fields: [qrlekhId], references: [id])
   qrlekhId   Int        @unique
+
+  QrImageMapping QrImageMapping[]
+}
+
+model QrImageMapping {
+  id    Int    @id @default(autoincrement())
+  title String
+  desc  String
+  shape String
+  coords Int[]
+  preFillColor String
+  fillColor String
+  strokeColor String
+  QrlekhImage QrlekhImage? @relation(fields: [qrMappingId], references: [id])
+  qrMappingId Int?
+  
+    createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model QrlekhGallery {
@@ -206,7 +224,7 @@ model QrBookmark {
   id Int @id @default(autoincrement())
 
   expiryDate DateTime
-  isBookmark Boolean @default(false)
+  isBookmark Boolean  @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -177,16 +177,19 @@ export class QrdataService {
           },
           image: {
             select: {
+              id: true,
               image: true,
             },
           },
           gallery: {
             select: {
+              id: true,
               gallery: true,
             },
           },
           qrReviews: {
             select: {
+              id: true,
               rating: true,
               israting: true,
               desc: true,
@@ -201,6 +204,7 @@ export class QrdataService {
           },
           tag: {
             select: {
+              id: true,
               tagName: true,
             },
           },
@@ -209,11 +213,13 @@ export class QrdataService {
           subQrlekh: true,
           type: {
             select: {
+              id: true,
               type: true,
             },
           },
           location: {
             select: {
+              id: true,
               lat: true,
               long: true,
               name: true,
@@ -263,11 +269,13 @@ export class QrdataService {
           image: {
             select: {
               image: true,
+              id: true,
             },
           },
           gallery: {
             select: {
               gallery: true,
+              id: true,
             },
           },
           qrReviews: {
@@ -287,6 +295,7 @@ export class QrdataService {
           tag: {
             select: {
               tagName: true,
+              id: true,
             },
           },
           qrBookmark: true,
@@ -295,10 +304,12 @@ export class QrdataService {
           type: {
             select: {
               type: true,
+              id: true,
             },
           },
           location: {
             select: {
+              id: true,
               lat: true,
               long: true,
               name: true,

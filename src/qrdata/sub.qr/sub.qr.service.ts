@@ -53,16 +53,19 @@ export class SubQrService {
         },
         image: {
           select: {
+            id: true,
             image: true,
           },
         },
         gallery: {
           select: {
+            id: true,
             gallery: true,
           },
         },
         qrReviews: {
           select: {
+            id: true,
             rating: true,
             israting: true,
             desc: true,
@@ -77,6 +80,7 @@ export class SubQrService {
         },
         tag: {
           select: {
+            id: true,
             tagName: true,
           },
         },
@@ -86,6 +90,7 @@ export class SubQrService {
           select: {
             id: true,
             title: true,
+            slug: true,
           },
         },
         type: {
@@ -115,16 +120,19 @@ export class SubQrService {
           },
           image: {
             select: {
+              id: true,
               image: true,
             },
           },
           gallery: {
             select: {
+              id: true,
               gallery: true,
             },
           },
           qrReviews: {
             select: {
+              id: true,
               rating: true,
               israting: true,
               desc: true,
@@ -139,6 +147,7 @@ export class SubQrService {
           },
           tag: {
             select: {
+              id: true,
               tagName: true,
             },
           },
@@ -146,7 +155,15 @@ export class SubQrService {
           favourite: true,
           type: {
             select: {
+              id: true,
               type: true,
+            },
+          },
+          QrlekhData: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
             },
           },
         },
@@ -185,16 +202,19 @@ export class SubQrService {
           },
           image: {
             select: {
+              id: true,
               image: true,
             },
           },
           gallery: {
             select: {
+              id: true,
               gallery: true,
             },
           },
           qrReviews: {
             select: {
+              id: true,
               rating: true,
               israting: true,
               desc: true,
@@ -209,14 +229,31 @@ export class SubQrService {
           },
           tag: {
             select: {
+              id: true,
               tagName: true,
             },
           },
           qrBookmark: true,
           favourite: true,
+          location: {
+            select: {
+              id: true,
+              lat: true,
+              long: true,
+              name: true,
+            },
+          },
           type: {
             select: {
+              id: true,
               type: true,
+            },
+          },
+          QrlekhData: {
+            select: {
+              id: true,
+              title: true,
+              slug: true,
             },
           },
         },

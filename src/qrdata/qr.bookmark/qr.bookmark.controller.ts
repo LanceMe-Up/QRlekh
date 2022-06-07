@@ -2,11 +2,11 @@ import {
   Body,
   Controller,
   Get,
-  Param,
-  Patch,
   Post,
   UseGuards,
   Request,
+  Delete,
+  Param,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
@@ -16,7 +16,6 @@ import { Roles } from '../../roles.decorates';
 import {
   CreateQrBookmarkDto,
   CreateSubQrBookmarkDto,
-  UpdateQrBookmarkDto,
 } from '../dto/bookmark.dto';
 import { QrBookmarkService } from './qr.bookmark.service';
 
@@ -56,14 +55,19 @@ export class QrBookmarkController {
     return this.qrService.createSubQrBookmark(data.subQrlekhId, req.user.id);
   }
 
-  @Patch('/:id/update-bookmark')
-  @UseGuards(RolesGuard)
-  @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
-  updateQrBookmark(
-    @Param('id') id: string,
-    @Body() data: UpdateQrBookmarkDto,
-    @Request() req: any,
-  ) {
-    return this.qrService.updateQrBookmark(+id, req.user.id, data);
+  @Delete(':id/remove')
+  deleteBookmark(@Param('id') id: number) {
+    return this.qrService.deleteQrBookmark({ id: id });
   }
+
+  // @Patch('/:id/update-bookmark')
+  // @UseGuards(RolesGuard)
+  // @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
+  // updateQrBookmark(
+  //   @Param('id') id: string,
+  //   @Body() data: UpdateQrBookmarkDto,
+  //   @Request() req: any,
+  // ) {
+  //   return this.qrService.updateQrBookmark(+id, req.user.id, data);
+  // }
 }

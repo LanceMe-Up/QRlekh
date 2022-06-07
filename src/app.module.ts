@@ -10,6 +10,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { CategoryModule } from './category/category.module';
 import { TagModule } from './tag/tag.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { TagModule } from './tag/tag.module';
       rootPath: join(__dirname, '..', 'public'),
       serveRoot: '/static',
     }),
+    ScheduleModule.forRoot(),
     AuthModule,
     UserModule,
     OtpModule,

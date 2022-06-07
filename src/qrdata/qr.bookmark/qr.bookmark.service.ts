@@ -4,6 +4,7 @@ import {
   HttpStatus,
   Injectable,
 } from '@nestjs/common';
+import { Cron, CronExpression } from '@nestjs/schedule';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 
@@ -51,6 +52,7 @@ export class QrBookmarkService {
           },
         },
       });
+
       return { count: data.length, data };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
@@ -121,10 +123,6 @@ export class QrBookmarkService {
 
   async createQrBookmark(qrlekhId: number, userId: number) {
     try {
-      // calculate date from 7 days
-      const date = new Date();
-      date.setDate(date.getDate() + 7);
-
       const bookmarkCheck = await this.checBookmarkId(userId, qrlekhId);
       if (bookmarkCheck.length !== 0) {
         throw new HttpException(
@@ -134,8 +132,6 @@ export class QrBookmarkService {
       }
       const data = await this.prismaService.qrBookmark.create({
         data: {
-          expiryDate: date,
-          isBookmark: true,
           userId,
           qrlekhId,
         },
@@ -147,24 +143,24 @@ export class QrBookmarkService {
   }
 
   async checksubBookmarkId(userId: number, subQrlekhId: number) {
-    const post = await this.prismaService.qrBookmark.findMany({
-      where: {
-        userId,
-        subQrlekhId,
-      },
-    });
-    if (!post) {
-      throw new BadRequestException({ message: `not found ${userId}` });
+    try {
+      const post = await this.prismaService.qrBookmark.findMany({
+        where: {
+          userId,
+          subQrlekhId,
+        },
+      });
+      if (!post) {
+        throw new BadRequestException({ message: `not found ${userId}` });
+      }
+      return post;
+    } catch (e) {
+      throw new BadRequestException({ message: e.message });
     }
-    return post;
   }
 
   async createSubQrBookmark(subQrlekhId: number, userId: number) {
     try {
-      // calculate date from 7 days
-      const subqrdate = new Date();
-      subqrdate.setDate(subqrdate.getDate() + 7);
-
       const bookmarkCheck = await this.checksubBookmarkId(userId, subQrlekhId);
       if (bookmarkCheck.length !== 0) {
         throw new HttpException(
@@ -174,8 +170,6 @@ export class QrBookmarkService {
       }
       const data = await this.prismaService.qrBookmark.create({
         data: {
-          expiryDate: subqrdate,
-          isBookmark: true,
           subQrlekhId,
           userId,
         },
@@ -186,31 +180,27 @@ export class QrBookmarkService {
     }
   }
 
-  async updateQrBookmark(
-    id: number,
-    userId: number,
-    dataBookmark: Prisma.QrBookmarkUpdateInput,
-  ) {
+  async deleteQrBookmark(where: Prisma.QrBookmarkWhereUniqueInput) {
     try {
-      const expirDate = new Date();
-      expirDate.setDate(expirDate.getDate() + 7);
-      const check = await this.findUserBookMark(userId);
-      if (check) {
-        const data = await this.prismaService.qrBookmark.updateMany({
-          where: {
-            id,
-            userId,
-          },
-          data: {
-            expiryDate: expirDate,
-            isBookmark: dataBookmark.isBookmark,
-          },
-        });
-        return { data };
-      }
-      return { msg: 'not found' };
+      await this.prismaService.qrBookmark.delete({
+        where,
+      });
+      return { message: 'bookmark is unchecked' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async handleCron() {
+    const currentDate = new Date();
+    currentDate.setDate(currentDate.getDate() + 12);
+    await this.prismaService.qrBookmark.deleteMany({
+      where: {
+        createdAt: {
+          gt: currentDate,
+        },
+      },
+    });
   }
 }

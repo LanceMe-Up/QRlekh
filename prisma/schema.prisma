@@ -183,7 +183,7 @@ model QrImageMapping {
   QrlekhImage QrlekhImage? @relation(fields: [qrMappingId], references: [id])
   qrMappingId Int?
   
-    createdAt DateTime @default(now())
+  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
@@ -238,7 +238,6 @@ model QrBookmark {
 
 model QrFavourite {
   id        Int     @id @default(autoincrement())
-  favourite Boolean @default(false)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

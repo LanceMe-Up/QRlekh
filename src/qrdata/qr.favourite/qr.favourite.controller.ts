@@ -43,7 +43,7 @@ export class QrFavouriteController {
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
   createQrFavourite(@Body() data: CreateQrFavouriteDto, @Request() req: any) {
-    return this.qrService.createQrFavourite(data, +data.qrlekhId, req.user.id);
+    return this.qrService.createQrFavourite(+data.qrlekhId, req.user.id);
   }
 
   @Post('/sub/qrlekh')
@@ -53,21 +53,32 @@ export class QrFavouriteController {
     @Body() data: CreateSubQrFavouriteDto,
     @Request() req: any,
   ) {
-    return this.qrService.createSubQrFavourite(
-      data,
-      data.subQrfavId,
-      req.user.id,
-    );
+    return this.qrService.createSubQrFavourite(data.subQrfavId, req.user.id);
   }
 
-  @Patch('/:id/update-qr')
+  // @Patch('/:id/update-qr')
+  // @UseGuards(RolesGuard)
+  // @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
+  // updateFavourite(
+  //   @Param('id') id: string,
+  //   @Request() req: any,
+  //   @Body() data: UpdateQrFavouriteDto,
+  // ) {
+  //   return this.qrService.updateQrFavourite(+id, req.user.id, data);
+  // }
+
+  @Patch('/:id/test/favourite')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
-  updateFavourite(
+  updateUpsertFavourite(
     @Param('id') id: string,
     @Request() req: any,
     @Body() data: UpdateQrFavouriteDto,
   ) {
-    return this.qrService.updateQrFavourite(+id, req.user.id, data);
+    return this.qrService.updateUpSertQrFavourite(
+      +id,
+      req.user.id,
+      data.qrlekhId,
+    );
   }
 }

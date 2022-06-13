@@ -1,7 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsInt, IsOptional } from 'class-validator';
+import { IsBoolean, IsInt } from 'class-validator';
 
 export class CreateQrFavouriteDto {
+  @IsInt()
+  @ApiProperty({
+    example: 1,
+    description: 'should be parent Qrlekh Id',
+  })
+  qrlekhId: number;
+}
+
+export class UpdateQrFavouriteDto {
   @IsBoolean()
   @ApiProperty({
     example: false,
@@ -15,16 +24,6 @@ export class CreateQrFavouriteDto {
     description: 'should be parent Qrlekh Id',
   })
   qrlekhId: number;
-}
-
-export class UpdateQrFavouriteDto {
-  @IsBoolean()
-  @IsOptional()
-  @ApiProperty({
-    example: false,
-    description: 'should be use for the favourite i.e true or false',
-  })
-  favourite: boolean;
 }
 
 export class CreateSubQrFavouriteDto {

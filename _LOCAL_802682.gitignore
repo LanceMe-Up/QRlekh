@@ -38,12 +38,4 @@ package-lock.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
 ecosystem.config.js
-
-
-note.txt
-.*.swo
-.*.swp
-
-

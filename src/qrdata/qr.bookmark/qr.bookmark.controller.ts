@@ -5,8 +5,6 @@ import {
   Post,
   UseGuards,
   Request,
-  Delete,
-  Param,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
@@ -55,10 +53,10 @@ export class QrBookmarkController {
     return this.qrService.createSubQrBookmark(data.subQrlekhId, req.user.id);
   }
 
-  @Delete(':id/remove')
-  deleteBookmark(@Param('id') id: number) {
-    return this.qrService.deleteQrBookmark({ id: id });
-  }
+  // @Delete(':id/remove')
+  // deleteBookmark(@Param('id') id: number) {
+  //   return this.qrService.deleteQrBookmark({ id: id });
+  // }
 
   // @Patch('/:id/update-bookmark')
   // @UseGuards(RolesGuard)

@@ -1,11 +1,5 @@
-import {
-  BadRequestException,
-  HttpException,
-  HttpStatus,
-  Injectable,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { Prisma } from '@prisma/client';
 import { PrismaService } from '../../prisma.service';
 
 @Injectable()
@@ -125,18 +119,15 @@ export class QrBookmarkService {
     try {
       const bookmarkCheck = await this.checBookmarkId(userId, qrlekhId);
       if (bookmarkCheck.length !== 0) {
-        throw new HttpException(
-          'already bookmark this qrlekh',
-          HttpStatus.CONFLICT,
-        );
+        return await this.deleteQrBookmark(userId, qrlekhId);
       }
-      const data = await this.prismaService.qrBookmark.create({
+      await this.prismaService.qrBookmark.create({
         data: {
           userId,
           qrlekhId,
         },
       });
-      return { data };
+      return { msg: 'QR Bookmark is mark' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
@@ -163,29 +154,30 @@ export class QrBookmarkService {
     try {
       const bookmarkCheck = await this.checksubBookmarkId(userId, subQrlekhId);
       if (bookmarkCheck.length !== 0) {
-        throw new HttpException(
-          'already sub bookmark this qrlekh',
-          HttpStatus.CONFLICT,
-        );
+        return await this.deleteQrBookmark(userId, null, subQrlekhId);
       }
-      const data = await this.prismaService.qrBookmark.create({
+      await this.prismaService.qrBookmark.create({
         data: {
           subQrlekhId,
           userId,
         },
       });
-      return { data };
+      return { msg: 'SubQR Bookmark is marked' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
   }
 
-  async deleteQrBookmark(where: Prisma.QrBookmarkWhereUniqueInput) {
+  async deleteQrBookmark(userId?: any, qrlekhId?: any, subQrlekhId?: any) {
     try {
-      await this.prismaService.qrBookmark.delete({
-        where,
+      await this.prismaService.qrBookmark.deleteMany({
+        where: {
+          userId,
+          qrlekhId,
+          subQrlekhId,
+        },
       });
-      return { message: 'bookmark is unchecked' };
+      return { message: 'bookmark is unmarked' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }

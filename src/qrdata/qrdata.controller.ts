@@ -7,7 +7,6 @@ import {
   Request,
   Param,
   UseGuards,
-  Delete,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { UserRole } from '@prisma/client';
@@ -56,28 +55,9 @@ export class QrdataController {
     return this.qrService.getDisLike({ id: Number(id) }, req.user.id);
   }
 
-  // remove a Like to a Post
-  @Delete(':id/likes')
-  removeLike(@Request() req: any, @Param('id') id: string) {
-    return this.qrService.removeLike({ id: Number(id) }, req.user.id);
-  }
-
-  // remove a disLike to a Post
-  @Delete(':id/dislikes')
-  removedisLike(@Request() req: any, @Param('id') id: string) {
-    return this.qrService.removeDisLike({ id: Number(id) }, req.user.id);
-  }
-
   // update - show Features
   @Patch('/update/:id/features')
   updateFeat(@Param('id') id: number, @Body('isFeature') isFeature: boolean) {
     return this.qrService.updateFeature(isFeature, +id);
   }
-
-  // @Delete(':id')
-  // @UseGuards(RolesGuard)
-  // @Roles(UserRole.ADMIN)
-  // async deleteData(@Param('id') id: number) {
-  //   return await this.qrService.deleteData(id);
-  // }
 }

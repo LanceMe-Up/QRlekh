@@ -6,7 +6,6 @@ import {
   Post,
   UseGuards,
   Request,
-  Delete,
   Patch,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -50,21 +49,9 @@ export class SubQrController {
   countsubLike(@Param('id') id: string, @Request() req: any) {
     return this.qrService.getSubLike({ id: Number(id) }, req.user.id);
   }
-  // remove a sub child Like to a Post
-  @Delete('/:id/sub-likes/remove')
-  @UseGuards(JwtAuthGuard)
-  removesubLike(@Request() req: any, @Param('id') id: string) {
-    return this.qrService.removeSubLike({ id: Number(id) }, req.user.id);
-  }
 
   @Patch('/:id/sub-dislikes')
   countdisLike(@Param('id') id: string, @Request() req: any) {
     return this.qrService.getSubDisLike({ id: Number(id) }, req.user.id);
-  }
-
-  // remove a Like to a Post
-  @Delete(':id/sub-dislikes/remove')
-  removeLike(@Request() req: any, @Param('id') id: string) {
-    return this.qrService.removeSubDisLike({ id: Number(id) }, req.user.id);
   }
 }

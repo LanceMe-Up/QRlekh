@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsBooleanString,
-  IsDecimal,
-  IsLatitude,
-  IsLongitude,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -19,16 +17,15 @@ export class CreateQrLocationDto {
   name: string;
 
   @ApiProperty()
-  @IsDecimal()
+  @IsNotEmpty()
   lat: number;
 
   @ApiProperty()
-  @IsDecimal()
+  @IsNotEmpty()
   long: number;
 
   @ApiProperty()
   @IsNumber()
-  @IsOptional()
   qrlekhId: number;
 }
 
@@ -46,11 +43,11 @@ export class GetLocationDto {
   is_metric: boolean;
 
   @ApiProperty()
-  @IsLongitude()
+  @IsNotEmpty()
   long: number;
 
   @ApiProperty()
-  @IsLatitude()
+  @IsNotEmpty()
   lat: number;
 }
 
@@ -64,11 +61,11 @@ export class CreateSubQrLocationDto {
   name: string;
 
   @ApiProperty()
-  @IsLatitude()
+  @IsNotEmpty()
   lat: number;
 
   @ApiProperty()
-  @IsLongitude()
+  @IsNotEmpty()
   long: number;
 
   @ApiProperty()

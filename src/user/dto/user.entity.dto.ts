@@ -1,15 +1,18 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
+import { Exclude, Expose } from 'class-transformer';
 import {
   IsEmail,
   IsEnum,
+  IsNotEmpty,
   IsOptional,
   IsString,
-  MinLength,
+  Length,
 } from 'class-validator';
 import { RoleDto } from './role.dto';
 
-export class CreateUserDto {
+export class UserEntityDto {
   @IsString()
+  @Expose()
   @ApiProperty({
     example: 'nirajan',
     description: 'should be enter full name',
@@ -17,25 +20,26 @@ export class CreateUserDto {
   readonly username: string;
 
   @IsEmail()
+  @Expose()
   @ApiProperty({
     example: 'kishorkc120@gmail.com',
     description: 'should be enter email',
   })
   readonly email: string;
 
+  @IsNotEmpty()
   @IsString()
-  @MinLength(8)
-  @ApiProperty({
-    example: 'meropa125ABC',
-    description: 'should be enter password',
-    minLength: 8,
-  })
+  @Exclude()
+  @Length(6, 30, { message: 'password has to be at between 6 and 30 chars' })
   readonly password: string;
 
   @IsOptional()
   @IsEnum(RoleDto)
+  @Exclude()
   @ApiProperty({ default: RoleDto.USER })
   readonly role: RoleDto.USER;
-}
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {}
+  constructor(partial: Partial<UserEntityDto>) {
+    Object.assign(this, partial);
+  }
+}

@@ -14,8 +14,8 @@ import {
   InitiateResetPasswordDto,
   FinalizeResetPasswordDto,
 } from '../auth/dto/resetPassword.dto';
-import { CreateUserDto } from '../user/dto/createUser.dto';
 import { ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from '../user/dto/createUser.dto';
 
 @Controller('auth')
 @ApiTags('auth')

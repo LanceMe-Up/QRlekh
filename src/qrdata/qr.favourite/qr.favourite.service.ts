@@ -222,7 +222,7 @@ export class QrFavouriteService {
   async updateUpSertQrFavourite(id: number, userId: number, qrlekhId: number) {
     try {
       const fav = await this.checkFavouriteId(userId, qrlekhId);
-      console.log(fav);
+
       if (fav.length !== 0) {
         throw new HttpException(
           'already favourite this post',

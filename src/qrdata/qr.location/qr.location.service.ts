@@ -54,6 +54,7 @@ export class QrLocationService {
           qrlekhId,
         },
       });
+
       return { data };
     } catch (e) {
       throw new BadRequestException({ message: e.message });

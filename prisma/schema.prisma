@@ -134,8 +134,8 @@ model SubQrlekhData {
 model QrLocation {
   id   Int    @id @default(autoincrement())
   name String
-  lat  Float
-  long Float
+  lat  Decimal
+  long Decimal
 
   QrlekhData QrlekhData? @relation(fields: [qrlekhId], references: [id])
   qrlekhId   Int?        @unique

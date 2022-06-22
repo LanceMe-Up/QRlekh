@@ -324,7 +324,7 @@ export class QrdataService {
     try {
       const post = await this.checkPostId(postId.id);
       const alreadyLiked = post.like.includes(userId);
-      console.log(alreadyLiked);
+
       if (alreadyLiked) {
         const newLikes = post.like.filter((x) => x !== userId);
         await this.prismaService.qrlekhData.update({

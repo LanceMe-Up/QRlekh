@@ -92,8 +92,8 @@ CREATE TABLE "SubQrlekhData" (
 CREATE TABLE "QrLocation" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
-    "lat" DOUBLE PRECISION NOT NULL,
-    "long" DOUBLE PRECISION NOT NULL,
+    "lat" DECIMAL(65,30) NOT NULL,
+    "long" DECIMAL(65,30) NOT NULL,
     "qrlekhId" INTEGER,
     "subqrId" INTEGER,
 
@@ -121,6 +121,23 @@ CREATE TABLE "QrlekhImage" (
     "qrlekhId" INTEGER NOT NULL,
 
     CONSTRAINT "QrlekhImage_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "QrImageMapping" (
+    "id" SERIAL NOT NULL,
+    "title" TEXT NOT NULL,
+    "desc" TEXT NOT NULL,
+    "shape" TEXT NOT NULL,
+    "coords" INTEGER[],
+    "preFillColor" TEXT NOT NULL,
+    "fillColor" TEXT NOT NULL,
+    "strokeColor" TEXT NOT NULL,
+    "qrMappingId" INTEGER,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "QrImageMapping_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -159,7 +176,6 @@ CREATE TABLE "SubQrlekhGallery" (
 -- CreateTable
 CREATE TABLE "QrBookmark" (
     "id" SERIAL NOT NULL,
-    "expiryDate" TIMESTAMP(3) NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" INTEGER,
@@ -172,7 +188,6 @@ CREATE TABLE "QrBookmark" (
 -- CreateTable
 CREATE TABLE "QrFavourite" (
     "id" SERIAL NOT NULL,
-    "favourite" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "qrlekhId" INTEGER,
@@ -284,6 +299,9 @@ ALTER TABLE "QrType" ADD CONSTRAINT "QrType_subQrlekhId_fkey" FOREIGN KEY ("subQ
 
 -- AddForeignKey
 ALTER TABLE "QrlekhImage" ADD CONSTRAINT "QrlekhImage_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "QrImageMapping" ADD CONSTRAINT "QrImageMapping_qrMappingId_fkey" FOREIGN KEY ("qrMappingId") REFERENCES "QrlekhImage"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "QrlekhGallery" ADD CONSTRAINT "QrlekhGallery_qrlekhId_fkey" FOREIGN KEY ("qrlekhId") REFERENCES "QrlekhData"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

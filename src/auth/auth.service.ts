@@ -50,13 +50,16 @@ export class AuthService {
         message: 'Email already exists!',
       });
 
-    return await this.userService.createUser({
+    const registerData = await this.userService.createUser({
       username: userDetail.username,
       email: userDetail.email,
       password: userDetail.password,
-      // phone: userDetail.phone,
       role: userDetail.role,
     });
+
+    const { id, username, email, role } = registerData;
+
+    return { id, username, email, role };
   }
 
   async resetUserPassword(email: string) {

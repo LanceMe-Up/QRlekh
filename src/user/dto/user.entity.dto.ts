@@ -14,7 +14,7 @@ export class UserEntityDto {
   @IsString()
   @Expose()
   @ApiProperty({
-    example: 'nirajan',
+    example: 'kishor',
     description: 'should be enter full name',
   })
   readonly username: string;

@@ -11,7 +11,7 @@ import { RoleDto } from './role.dto';
 export class CreateUserDto {
   @IsString()
   @ApiProperty({
-    example: 'nirajan',
+    example: 'kishor',
     description: 'should be enter full name',
   })
   readonly username: string;

@@ -56,7 +56,7 @@ CREATE TABLE "QrlekhData" (
     "knownFor" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "slug" TEXT NOT NULL,
-    "visitor" INTEGER NOT NULL DEFAULT 0,
+    "visitor" INTEGER[],
     "isFeature" BOOLEAN NOT NULL DEFAULT false,
     "desc" TEXT NOT NULL,
     "like" INTEGER[],
@@ -230,6 +230,9 @@ CREATE UNIQUE INDEX "ProfileImage_userId_key" ON "ProfileImage"("userId");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "QrlekhData_title_key" ON "QrlekhData"("title");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "QrlekhData_slug_key" ON "QrlekhData"("slug");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "SubQrlekhData_title_key" ON "SubQrlekhData"("title");

@@ -8,7 +8,7 @@ export class QrdataService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly slugifyService: SlugifyService,
-  ) {}
+  ) { }
 
   async createQr(
     createQr: Prisma.QrlekhDataCreateInput,
@@ -16,20 +16,30 @@ export class QrdataService {
     categoryId: any,
   ) {
     try {
+      const allData = await this.get();
       const slug: string = this.slugifyService.toSlug(createQr.title);
-      return await this.prismaService.qrlekhData.create({
-        data: {
-          knownFor: createQr.knownFor,
-          title: createQr.title,
-          slug,
-          visitor: createQr.visitor,
-          desc: createQr.desc,
-          like: createQr.like,
-          isFeature: createQr.isFeature,
-          userId,
-          categoryId,
-        },
-      });
+
+      for (const newData of allData.data) {
+        if (newData.title === createQr.title) {
+          throw new BadRequestException('must be unique title');
+        }
+        await this.prismaService.qrlekhData.create({
+          data: {
+            knownFor: createQr.knownFor,
+            title: createQr.title,
+            slug,
+            visitor: createQr.visitor,
+            desc: createQr.desc,
+            like: createQr.like,
+            isFeature: createQr.isFeature,
+            userId,
+            categoryId,
+          },
+        });
+        return { success: true, message: 'successfully created!' };
+      }
+
+
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
@@ -228,7 +238,7 @@ export class QrdataService {
     }
   }
 
-  async getBySlug(slug: string) {
+  async getBySlug(slug: string, userId: any) {
     try {
       // for visitors
       await this.prismaService.qrlekhData.updateMany({
@@ -237,8 +247,8 @@ export class QrdataService {
         },
         data: {
           visitor: {
-            increment: 1,
-          },
+            push: userId,
+          }
         },
       });
 
@@ -319,6 +329,25 @@ export class QrdataService {
     }
   }
 
+  // // add a visitor from a qrlekh data
+  // async getVisitor(postId: Prisma.QrlekhDataWhereUniqueInput, userId: any) {
+  //   try {
+  //     await this.prismaService.qrlekhData.update({
+  //       data: {
+  //         visitor: {
+  //           push: userId,
+  //         },
+  //       },
+  //       where: {
+  //         id: postId.id,
+  //       },
+  //     });
+  //     return { message: 'visitor added' };
+  //   } catch (e) {
+  //     throw new BadRequestException({ message: e.message });
+  //   }
+  // }
+
   // add a like from a qrlekh data
   async getLike(postId: Prisma.QrlekhDataWhereUniqueInput, userId: any) {
     try {
@@ -386,6 +415,26 @@ export class QrdataService {
     }
   }
 
+  async checkPostSlug(id: number) {
+    const post = await this.prismaService.qrlekhData.findUnique({
+      where: {
+        id,
+      },
+      include: {
+        User: {
+          select: {
+            id: true,
+            username: true,
+          },
+        },
+      },
+    });
+    if (!post) {
+      throw new BadRequestException({ message: `not found ${id}` });
+    }
+    return post;
+  }
+
   async checkPostId(id: number) {
     const post = await this.prismaService.qrlekhData.findUnique({
       where: {
@@ -404,5 +453,31 @@ export class QrdataService {
       throw new BadRequestException({ message: `not found ${id}` });
     }
     return post;
+  }
+
+  async recommendation(userId: any) {
+    try {
+      const excludedDatawithCount = [];
+      const toReturn = [];
+      const allData = await this.prismaService.qrlekhData.findMany();
+
+      for (const data of allData) {
+
+        if (!data.visitor.includes(userId)) {
+          excludedDatawithCount.push({ ...data, count: data.like.length + data.dislike.length })
+        }
+      }
+
+      excludedDatawithCount.sort((a, b) => b.count - a.count)
+
+      for (const item of excludedDatawithCount) {
+        const { count, ...res } = item;
+        toReturn.push(res);
+      }
+
+      return toReturn;
+    } catch (e) {
+      throw new BadRequestException(e.message);
+    }
   }
 }

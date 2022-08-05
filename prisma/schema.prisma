@@ -63,8 +63,9 @@ model QrlekhData {
   id        Int          @id @default(autoincrement())
   knownFor  String
   title     String       @unique
-  slug      String
-  visitor   Int          @default(0)
+  slug      String       @unique
+  // countVisitor   Int          @default(0)
+  visitor   Int[]
   isFeature Boolean      @default(false)
   image     QrlekhImage?
   location  QrLocation?
@@ -94,7 +95,6 @@ model QrlekhData {
   qrReviews QrReviews[]
 
   subQrlekh SubQrlekhData[]
-
 }
 
 // child
@@ -103,7 +103,8 @@ model SubQrlekhData {
   knownFor  String
   title     String          @unique
   slug      String
-  visitor   Int             @default(0)
+  // visitor   Int             @default(0)
+  visitor   Int[]
   isFeature Boolean         @default(false)
   image     SubQrlekhImage?
   location  QrLocation?
@@ -132,7 +133,7 @@ model SubQrlekhData {
 }
 
 model QrLocation {
-  id   Int    @id @default(autoincrement())
+  id   Int     @id @default(autoincrement())
   name String
   lat  Decimal
   long Decimal
@@ -155,7 +156,6 @@ model QrType {
   qrlekhId      Int?           @unique
   SubQrlekhData SubQrlekhData? @relation(fields: [subQrlekhId], references: [id])
   subQrlekhId   Int?           @unique
-
 }
 
 model QrlekhImage {
@@ -172,17 +172,17 @@ model QrlekhImage {
 }
 
 model QrImageMapping {
-  id    Int    @id @default(autoincrement())
-  title String
-  desc  String
-  shape String
-  coords Int[]
+  id           Int          @id @default(autoincrement())
+  title        String
+  desc         String
+  shape        String
+  coords       Int[]
   preFillColor String
-  fillColor String
-  strokeColor String
-  QrlekhImage QrlekhImage? @relation(fields: [qrMappingId], references: [id])
-  qrMappingId Int?
-  
+  fillColor    String
+  strokeColor  String
+  QrlekhImage  QrlekhImage? @relation(fields: [qrMappingId], references: [id])
+  qrMappingId  Int?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -237,7 +237,7 @@ model QrBookmark {
 }
 
 model QrFavourite {
-  id        Int     @id @default(autoincrement())
+  id Int @id @default(autoincrement())
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

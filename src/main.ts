@@ -28,6 +28,11 @@ async function bootstrap() {
     }),
   );
 
+  app.enableVersioning({
+    defaultVersion: '1',
+    type: VersioningType.URI
+  });
+
   const config = new DocumentBuilder()
     .setTitle('Qrlekh')
     .setDescription('The project of Qrlekh...')

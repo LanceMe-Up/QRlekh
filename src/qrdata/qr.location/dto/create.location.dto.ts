@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, PartialType } from '@nestjs/swagger';
 import {
   IsBooleanString,
   IsNotEmpty,
@@ -73,3 +73,7 @@ export class CreateSubQrLocationDto {
   @IsOptional()
   subqrId: number;
 }
+
+export class UpdateSubQrLocationDto extends PartialType(
+  CreateSubQrLocationDto,
+) {}

@@ -26,7 +26,7 @@ export class TagController {
   constructor(private readonly tagService: TagService) {}
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Get()
   async getAll() {
     const data = await this.tagService.getTag();
@@ -36,21 +36,21 @@ export class TagController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post('/qr')
   async createQr(@Body() dto: TagQrDto) {
     return this.tagService.createQrTag(dto, dto.qrlekhId);
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Post('/sub/qr')
   async createSubQr(@Body() dto: TagSubQrDto) {
     return this.tagService.createSubQrTag(dto, dto.subtagId);
   }
 
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   @Patch(':id')
   async update(@Body() dto: UpdateTagDto, @Param('id') id: string) {
     return this.tagService.updateTag(

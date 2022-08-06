@@ -45,7 +45,7 @@ export class SubQrController {
 
   @Post()
   @UseGuards(RolesGuard)
-  @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)
+  @Roles(UserRole.ADMIN, UserRole.SUPERADMIN)
   createSub(@Body() data: SubQrDto, @Request() req: any) {
     return this.qrService.createSubQr(data, req.user.id, data.qrlekhDataId);
   }

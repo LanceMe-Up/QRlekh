@@ -17,6 +17,7 @@ import {
   CreateQrLocationDto,
   CreateSubQrLocationDto,
   GetLocationDto,
+  UpdateSubQrLocationDto,
 } from './dto/create.location.dto';
 import { QrLocationService } from './qr.location.service';
 
@@ -74,7 +75,10 @@ export class QrLocationController {
   @Patch('/:id')
   @UseGuards(RolesGuard)
   @Roles(UserRole.USER, UserRole.ADMIN, UserRole.SUPERADMIN)
-  updateFavourite(@Param('id') id: string, @Body() data: any) {
+  updateFavourite(
+    @Param('id') id: string,
+    @Body() data: UpdateSubQrLocationDto,
+  ) {
     return this.qrService.updateQrLocation(+id, data);
   }
 }

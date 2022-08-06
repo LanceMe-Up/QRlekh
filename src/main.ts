@@ -11,6 +11,7 @@ async function bootstrap() {
     origin: '*',
     credentials: true,
   });
+
   app.use(
     helmet({
       crossOriginResourcePolicy: false,

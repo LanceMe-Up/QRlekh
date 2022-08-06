@@ -8,7 +8,7 @@ export class QrdataService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly slugifyService: SlugifyService,
-  ) { }
+  ) {}
 
   async createQr(
     createQr: Prisma.QrlekhDataCreateInput,
@@ -23,23 +23,23 @@ export class QrdataService {
         if (newData.title === createQr.title) {
           throw new BadRequestException('must be unique title');
         }
-        await this.prismaService.qrlekhData.create({
-          data: {
-            knownFor: createQr.knownFor,
-            title: createQr.title,
-            slug,
-            visitor: createQr.visitor,
-            desc: createQr.desc,
-            like: createQr.like,
-            isFeature: createQr.isFeature,
-            userId,
-            categoryId,
-          },
-        });
-        return { success: true, message: 'successfully created!' };
       }
+      const data = await this.prismaService.qrlekhData.create({
+        data: {
+          knownFor: createQr.knownFor,
+          title: createQr.title,
+          slug,
+          visitor: createQr.visitor,
+          desc: createQr.desc,
+          like: createQr.like,
+          isFeature: createQr.isFeature,
+          userId,
+          categoryId,
+        },
+      });
+      console.log('data', data);
 
-
+      return { success: true, message: 'successfully created!' };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
@@ -248,7 +248,7 @@ export class QrdataService {
         data: {
           visitor: {
             push: userId,
-          }
+          },
         },
       });
 
@@ -462,13 +462,15 @@ export class QrdataService {
       const allData = await this.prismaService.qrlekhData.findMany();
 
       for (const data of allData) {
-
         if (!data.visitor.includes(userId)) {
-          excludedDatawithCount.push({ ...data, count: data.like.length + data.dislike.length })
+          excludedDatawithCount.push({
+            ...data,
+            count: data.like.length + data.dislike.length,
+          });
         }
       }
 
-      excludedDatawithCount.sort((a, b) => b.count - a.count)
+      excludedDatawithCount.sort((a, b) => b.count - a.count);
 
       for (const item of excludedDatawithCount) {
         const { count, ...res } = item;

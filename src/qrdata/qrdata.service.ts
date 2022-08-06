@@ -37,9 +37,8 @@ export class QrdataService {
           categoryId,
         },
       });
-      console.log('data', data);
 
-      return { success: true, message: 'successfully created!' };
+      return { success: true, message: 'successfully created!', data };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }

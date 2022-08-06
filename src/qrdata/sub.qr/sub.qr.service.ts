@@ -8,7 +8,7 @@ export class SubQrService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly slugifyService: SlugifyService,
-  ) { }
+  ) {}
 
   async createSubQr(
     createQr: Prisma.SubQrlekhDataCreateInput,
@@ -24,23 +24,23 @@ export class SubQrService {
         if (newSubQr.title === createQr.title) {
           throw new BadRequestException('must be unique title');
         }
-        await this.prismaService.subQrlekhData.create({
-          data: {
-            knownFor: createQr.knownFor,
-            title: createQr.title,
-            slug,
-            visitor: createQr.visitor,
-            location: createQr.location,
-            isFeature: createQr.isFeature,
-            desc: createQr.desc,
-            like: createQr.like,
-            userId,
-            qrlekhDataId,
-          },
-        });
-
-        return { success: true, message: 'successfully created!' };
       }
+      const data = await this.prismaService.subQrlekhData.create({
+        data: {
+          knownFor: createQr.knownFor,
+          title: createQr.title,
+          slug,
+          visitor: createQr.visitor,
+          location: createQr.location,
+          isFeature: createQr.isFeature,
+          desc: createQr.desc,
+          like: createQr.like,
+          userId,
+          qrlekhDataId,
+        },
+      });
+
+      return { success: true, message: 'successfully created!', data };
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
@@ -398,13 +398,15 @@ export class SubQrService {
       const allData = await this.prismaService.subQrlekhData.findMany();
 
       for (const data of allData) {
-
         if (!data.visitor.includes(userId)) {
-          excludedDatawithCount.push({ ...data, count: data.like.length + data.dislike.length })
+          excludedDatawithCount.push({
+            ...data,
+            count: data.like.length + data.dislike.length,
+          });
         }
       }
 
-      excludedDatawithCount.sort((a, b) => b.count - a.count)
+      excludedDatawithCount.sort((a, b) => b.count - a.count);
 
       for (const item of excludedDatawithCount) {
         const { count, ...res } = item;

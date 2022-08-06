@@ -21,7 +21,7 @@ import { SubQrService } from './sub.qr.service';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class SubQrController {
-  constructor(private readonly qrService: SubQrService) { }
+  constructor(private readonly qrService: SubQrService) {}
 
   @Get()
   async getSub() {

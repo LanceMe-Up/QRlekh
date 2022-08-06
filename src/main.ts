@@ -1,4 +1,4 @@
-import { ValidationPipe, VersioningType } from '@nestjs/common';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { urlencoded } from 'express';
@@ -28,10 +28,10 @@ async function bootstrap() {
     }),
   );
 
-  app.enableVersioning({
-    defaultVersion: '1',
-    type: VersioningType.URI
-  });
+  // app.enableVersioning({
+  //   defaultVersion: '1',
+  //   type: VersioningType.URI,
+  // });
 
   const config = new DocumentBuilder()
     .setTitle('Qrlekh')

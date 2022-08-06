@@ -35,14 +35,19 @@ export class QrdataController {
     return await this.qrService.get();
   }
 
+  @Get('/recommendation')
+  getRecommendation(@Request() req: any) {
+    return this.qrService.recommendation(req.user.id);
+  }
+
   @Get('/:id')
   getById(@Param('id') id: string) {
     return this.qrService.getById({ id: Number(id) });
   }
 
   @Get('/:slug/data')
-  getSlug(@Param('slug') slug: string) {
-    return this.qrService.getBySlug(slug);
+  getSlug(@Param('slug') slug: string, @Request() req: any) {
+    return this.qrService.getBySlug(slug, req.user.id);
   }
 
   @Patch('/:id/likes')

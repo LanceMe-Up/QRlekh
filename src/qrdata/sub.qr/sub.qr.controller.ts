@@ -21,7 +21,17 @@ import { SubQrService } from './sub.qr.service';
 @ApiBearerAuth()
 @UseGuards(JwtAuthGuard)
 export class SubQrController {
-  constructor(private readonly qrService: SubQrService) {}
+  constructor(private readonly qrService: SubQrService) { }
+
+  @Get()
+  async getSub() {
+    return await this.qrService.getSubQr();
+  }
+
+  @Get('/recommendation')
+  getRecommendation(@Request() req: any) {
+    return this.qrService.recommendationSubQr(req.user.id);
+  }
 
   @Get('/:id')
   getBySubQrlekhId(@Param('id') id: string) {
@@ -29,14 +39,10 @@ export class SubQrController {
   }
 
   @Get('/:slug/data')
-  getSubQrlekhSlug(@Param('slug') slug: string) {
-    return this.qrService.getBySubQrSlug(slug);
+  getSubQrlekhSlug(@Param('slug') slug: string, @Request() req: any) {
+    return this.qrService.getBySubQrSlug(slug, req.user.id);
   }
 
-  @Get()
-  async getSub() {
-    return await this.qrService.getSubQr();
-  }
   @Post()
   @UseGuards(RolesGuard)
   @Roles(UserRole.ADMIN || UserRole.SUPERADMIN)

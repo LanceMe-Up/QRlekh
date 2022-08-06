@@ -8,7 +8,7 @@ export class SubQrService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly slugifyService: SlugifyService,
-  ) {}
+  ) { }
 
   async createSubQr(
     createQr: Prisma.SubQrlekhDataCreateInput,
@@ -17,20 +17,30 @@ export class SubQrService {
   ) {
     try {
       const slug: string = this.slugifyService.toSlug(createQr.title);
-      return await this.prismaService.subQrlekhData.create({
-        data: {
-          knownFor: createQr.knownFor,
-          title: createQr.title,
-          slug,
-          visitor: createQr.visitor,
-          location: createQr.location,
-          isFeature: createQr.isFeature,
-          desc: createQr.desc,
-          like: createQr.like,
-          userId,
-          qrlekhDataId,
-        },
-      });
+
+      const allSubQr = await this.getSubQr();
+
+      for (const newSubQr of allSubQr.data) {
+        if (newSubQr.title === createQr.title) {
+          throw new BadRequestException('must be unique title');
+        }
+        await this.prismaService.subQrlekhData.create({
+          data: {
+            knownFor: createQr.knownFor,
+            title: createQr.title,
+            slug,
+            visitor: createQr.visitor,
+            location: createQr.location,
+            isFeature: createQr.isFeature,
+            desc: createQr.desc,
+            like: createQr.like,
+            userId,
+            qrlekhDataId,
+          },
+        });
+
+        return { success: true, message: 'successfully created!' };
+      }
     } catch (e) {
       throw new BadRequestException({ message: e.message });
     }
@@ -169,7 +179,7 @@ export class SubQrService {
     }
   }
 
-  async getBySubQrSlug(slug: string) {
+  async getBySubQrSlug(slug: string, userId: any) {
     try {
       // for visitors
       await this.prismaService.subQrlekhData.updateMany({
@@ -178,7 +188,7 @@ export class SubQrService {
         },
         data: {
           visitor: {
-            increment: 1,
+            push: userId,
           },
         },
       });
@@ -292,35 +302,6 @@ export class SubQrService {
     }
   }
 
-  // // remove a like
-  // async removeSubLike(
-  //   postId: Prisma.SubQrlekhDataWhereUniqueInput,
-  //   userId: any,
-  // ) {
-  //   try {
-  //     const post = await this.checkSubPostId(postId.id);
-  //     const alreadyLiked = post.like.includes(userId);
-  //     if (!alreadyLiked) {
-  //       throw new HttpException(
-  //         'You already removed your like from this post',
-  //         HttpStatus.CONFLICT,
-  //       );
-  //     }
-  //     const newLikes = post.like.filter((x) => x !== userId);
-  //     await this.prismaService.subQrlekhData.update({
-  //       where: {
-  //         id: postId.id,
-  //       },
-  //       data: {
-  //         like: newLikes,
-  //       },
-  //     });
-  //     return { message: 'Removed like successfully' };
-  //   } catch (e) {
-  //     throw new BadRequestException({ message: e.message });
-  //   }
-  // }
-
   // add a sub qr dislike
   async getSubDisLike(
     postId: Prisma.SubQrlekhDataWhereUniqueInput,
@@ -407,6 +388,32 @@ export class SubQrService {
       return post;
     } catch (e) {
       throw new BadRequestException({ message: e.message });
+    }
+  }
+
+  async recommendationSubQr(userId: any) {
+    try {
+      const excludedDatawithCount = [];
+      const toReturn = [];
+      const allData = await this.prismaService.subQrlekhData.findMany();
+
+      for (const data of allData) {
+
+        if (!data.visitor.includes(userId)) {
+          excludedDatawithCount.push({ ...data, count: data.like.length + data.dislike.length })
+        }
+      }
+
+      excludedDatawithCount.sort((a, b) => b.count - a.count)
+
+      for (const item of excludedDatawithCount) {
+        const { count, ...res } = item;
+        toReturn.push(res);
+      }
+
+      return toReturn;
+    } catch (e) {
+      throw new BadRequestException(e.message);
     }
   }
 }

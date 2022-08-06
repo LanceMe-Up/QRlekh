@@ -33,7 +33,7 @@ export class UsersController {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeDetails } = user;
-    console.log(`${user.password} ${user.email}`);
+    // console.log(`${user.password} ${user.email}`);
     return safeDetails;
   }
 
@@ -44,7 +44,7 @@ export class UsersController {
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeDetails } = user;
-    console.log(`${user.password} ${user.email}`);
+    // console.log(`${user.password} ${user.email}`);
     return safeDetails;
   }
 

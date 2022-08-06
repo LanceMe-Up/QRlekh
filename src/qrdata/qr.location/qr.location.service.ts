@@ -49,8 +49,8 @@ export class QrLocationService {
       const data = await this.prismaService.qrLocation.create({
         data: {
           name: dataFav.name,
-          lat: dataFav.lat,
-          long: dataFav.long,
+          lat: dataFav.lat as Prisma.Decimal,
+          long: dataFav.long as Prisma.Decimal,
           qrlekhId,
         },
       });
@@ -96,8 +96,8 @@ export class QrLocationService {
       const data = await this.prismaService.qrLocation.create({
         data: {
           name: dataFav.name,
-          lat: dataFav.lat,
-          long: dataFav.long,
+          lat: dataFav.lat as Prisma.Decimal,
+          long: dataFav.long as Prisma.Decimal,
           subqrId,
         },
       });
@@ -115,8 +115,8 @@ export class QrLocationService {
         },
         data: {
           name: dataFav.name,
-          lat: dataFav.lat,
-          long: dataFav.long,
+          lat: dataFav.lat as Prisma.Decimal,
+          long: dataFav.long as Prisma.Decimal,
         },
       });
       return { data };
